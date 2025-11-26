@@ -29,12 +29,12 @@ has_files() {
 
 
 function main() {
-  rm -rf /tmp/kyanos_* | true
+  rm -rf /tmp/claudeinsight_* | true
   # kubectl delete pod test-ptcpdump | true
-  CMD="./kyanos"
-  has_files "/var/lib/kyanos/btf"
-  if [ -f "/var/lib/kyanos/btf/current.btf" ]; then  
-    CMD="./kyanos --btf /var/lib/kyanos/btf/current.btf "
+  CMD="./claudeinsight"
+  has_files "/var/lib/claudeinsight/btf"
+  if [ -f "/var/lib/claudeinsight/btf/current.btf" ]; then  
+    CMD="./claudeinsight --btf /var/lib/claudeinsight/btf/current.btf "
   fi
   set -ex
   # bash testdata/test_base.sh "$CMD"
@@ -45,8 +45,6 @@ function main() {
   # bash testdata/test_docker_filter_by_pid.sh "$CMD"
   # bash testdata/test_containerd_filter_by_container_id.sh "$CMD" "$DOCKER_REGISTRY"
   # bash testdata/test_containerd_filter_by_container_name.sh "$CMD" "$DOCKER_REGISTRY"
-  # bash testdata/test_redis.sh "$CMD" "$DOCKER_REGISTRY"
-  # bash testdata/test_mysql.sh "$CMD" "$DOCKER_REGISTRY"
   bash testdata/test_rocketmq.sh "$CMD" "$DOCKER_REGISTRY"
   # bash testdata/test_https.sh "$CMD"
   # bash testdata/test_side.sh "$CMD" "$DOCKER_REGISTRY"

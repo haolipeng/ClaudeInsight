@@ -1,8 +1,7 @@
 package conn
 
 import (
-	"kyanos/agent/metadata"
-	"kyanos/common"
+	"claudeinsight/common"
 	"os"
 	"os/exec"
 	"regexp"
@@ -26,13 +25,7 @@ func init() {
 }
 
 func getInterfaceNameByIndex(index int, pid int) (string, error) {
-	var netnsId int64
-	pidInfo := metadata.GetPidInfo(pid)
-	if pidInfo.NetNS != 0 {
-		netnsId = pidInfo.NetNS
-	} else {
-		netnsId = common.GetNetworkNamespaceFromPid(pid)
-	}
+	netnsId := common.GetNetworkNamespaceFromPid(pid)
 	netnsName, found := netnsIDMap[strconv.FormatInt(netnsId, 10)]
 	if !found {
 		netnsName = "default"

@@ -2,11 +2,11 @@ package agent_test
 
 import (
 	"fmt"
-	ac "kyanos/agent/common"
-	"kyanos/agent/compatible"
-	"kyanos/agent/conn"
-	"kyanos/bpf"
-	"kyanos/common"
+	ac "claudeinsight/agent/common"
+	"claudeinsight/agent/compatible"
+	"claudeinsight/agent/conn"
+	"claudeinsight/bpf"
+	"claudeinsight/common"
 	"os"
 	"testing"
 	"time"
@@ -177,7 +177,7 @@ func TestExistedConn(t *testing.T) {
 		readSyscall:    Read,
 		keepConnection: true,
 	})
-	// established conn and write data before start kyanos
+	// established conn and write data before start claudeinsight
 
 	connEventList := make([]bpf.AgentConnEvtT, 0)
 	syscallEventList := make([]bpf.SyscallEventData, 0)

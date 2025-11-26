@@ -3,7 +3,7 @@
 set -ex
 
 CMD="$1"
-FILE_PREFIX="/tmp/kyanos"
+FILE_PREFIX="/tmp/claudeinsight"
 GOTLS_CLIENT_LNAME="${FILE_PREFIX}_gotls_client.log"
 GOTLS_SERVER_LNAME="${FILE_PREFIX}_gotls_server.log"
 

@@ -4,7 +4,7 @@ import (
 	"debug/dwarf"
 	"errors"
 	"fmt"
-	"kyanos/common"
+	"claudeinsight/common"
 	"strings"
 	"unsafe"
 )

@@ -3,8 +3,8 @@ package watch
 import (
 	"cmp"
 	"fmt"
-	"kyanos/agent/analysis/common"
-	c "kyanos/common"
+	"claudeinsight/agent/analysis/common"
+	c "claudeinsight/common"
 	"slices"
 	"strings"
 

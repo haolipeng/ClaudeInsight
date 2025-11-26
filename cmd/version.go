@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"kyanos/version"
+	"claudeinsight/version"
 
 	"github.com/spf13/cobra"
 )
@@ -10,7 +10,7 @@ import (
 var (
 	versionCmd = &cobra.Command{
 		Use:   "version",
-		Short: "Print the version of kyanos",
+		Short: "Print the version of claudeinsight",
 		Run: func(cmd *cobra.Command, args []string) {
 			// The following vars are set by the linker during build. See the .goreleaser.yaml
 			// reference: https://goreleaser.com/customization/builds/

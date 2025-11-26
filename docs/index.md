@@ -3,24 +3,24 @@
 layout: home
 
 hero:
-  name: "Kyanos"
+  name: "ClaudeInsight"
   text: "A Simple & Powerful Network Tracing Tool"
   tagline:
     Visualize the time packets spend in the kernel, watch & analyze in command
     line.
   image:
-    src: /kyanos.png
-    alt: Kyanos
+    src: /ClaudeInsight.png
+    alt: ClaudeInsight
   actions:
     - theme: brand
-      text: What is Kyanos?
-      link: ./what-is-kyanos
+      text: What is ClaudeInsight?
+      link: ./what-is-ClaudeInsight
     - theme: alt
       text: Quickstart
       link: ./quickstart
     - theme: alt
       text: Star me at Github!
-      link: https://github.com/hengyoush/kyanos
+      link: https://github.com/hengyoush/ClaudeInsight
 
 features:
   - icon: 🚀
@@ -29,12 +29,12 @@ features:
       Focusing on the Layer 7 protocol, capture and analyze application layer
       network performance with a single command.
     link: ./how-to
-    linkText: Learn how to use kyanos
+    linkText: Learn how to use ClaudeInsight
   - icon: 🎯️
     title: Advanced Traffic Filtering
     details:
-      Supports filtering traffic based on protocol fields (such as HTTP Path or
-      Redis Command), process PID, container ID, and K8s Pod names.
+      Supports filtering traffic based on protocol fields (such as HTTP Path),
+      process PID, container ID, and K8s Pod names.
     link: ./watch#how-to-filter
     linkText: Learn how to filter traffic
   - icon: 📈️
@@ -58,12 +58,12 @@ features:
       Command-line based, offering visual output without the need for complex
       file downloads and analysis steps like tcpdump.
     link: ./how-to
-    linkText: Learn how to use kyanos
+    linkText: Learn how to use ClaudeInsight
   - icon: 🌐️
     title: Lightweight and Compatible
     details:
       Operates without any external dependencies and is compatible with kernel
       versions from 3.10 to the latest
     link: ./quickstart#prerequire
-    linkText: Install kyanos
+    linkText: Install ClaudeInsight
 ---

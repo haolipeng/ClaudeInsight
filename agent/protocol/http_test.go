@@ -4,9 +4,9 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"kyanos/agent/buffer"
-	"kyanos/agent/protocol"
-	"kyanos/common"
+	"claudeinsight/agent/buffer"
+	"claudeinsight/agent/protocol"
+	"claudeinsight/common"
 	"net/http"
 	"reflect"
 	"regexp"
@@ -184,7 +184,7 @@ func TestHttpFilter_Filter(t *testing.T) {
 		{
 			name: "not_http_req",
 			args: args{
-				parsedReq: &protocol.RedisMessage{},
+				parsedReq: &protocol.ParsedHttpResponse{},
 			},
 			want: false,
 		},

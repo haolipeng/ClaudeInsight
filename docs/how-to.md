@@ -5,9 +5,9 @@ next:
 prev: false
 ---
 
-# Learn Kyanos in 5 Minutes
+# Learn claudeinsight in 5 Minutes
 
-Kyanos has three main subcommands: `watch`, `stat`, and `overview`. Here’s what
+claudeinsight has three main subcommands: `watch`, `stat`, and `overview`. Here’s what
 each command does:
 
 1. **watch**: Captures network traffic according to specified options and
@@ -19,19 +19,19 @@ each command does:
 
 ## Basic Usage of Traffic Capture with `watch`
 
-The simplest usage captures all protocols traffic currently supported by Kyanos:
+The simplest usage captures all protocols traffic currently supported by ClaudeInsight:
 
 ```bash
-./kyanos watch
+./claudeinsight watch
 ```
 
 Each request-response record is displayed as a row in a table. You can use the
 arrow keys or `j/k` to move up and down through the records:
-![kyanos watch result](/watch-result.jpg)
+![ClaudeInsight watch result](/watch-result.jpg)
 
 Press `Enter` to access the details view:
 
-![kyanos watch result detail](/watch-result-detail.jpg)
+![ClaudeInsight watch result detail](/watch-result-detail.jpg)
 
 The first part of the details page is **Latency Details**. Each block represents a node that the data packet passes through, such as processes, network cards, socket buffers, etc. Below each block, there is a latency value, which indicates the time taken from the previous node to this node. You can clearly see the process of the request being sent from the process to the network card, and the response being copied from the network card to be read by the process, along with the latency of each step.
 
@@ -42,13 +42,13 @@ The third part is **Specific Content of the Request and Response**, divided into
 For more precise traffic capture, such as HTTP traffic:
 
 ```bash
-./kyanos watch http
+./claudeinsight watch http
 ```
 
 You can narrow it down further to capture traffic for a specific HTTP path:
 
 ```bash
-./kyanos watch http --path /abc
+./claudeinsight watch http --path /abc
 ```
 
 Each protocol has different filtering options. For more details, see:
@@ -56,7 +56,7 @@ Each protocol has different filtering options. For more details, see:
 
 ## Basic Usage of Aggregated Analysis with `stat`
 
-In real-world scenarios, `watch` output is often too granular. Therefore, Kyanos
+In real-world scenarios, `watch` output is often too granular. Therefore, ClaudeInsight
 offers the `stat` command for **statistical analysis**.
 
 In short, `stat` can help answer questions like: Which connections have the
@@ -69,12 +69,12 @@ filtering options supported by `watch`. Here, we’ll collect only HTTP requests
 with `PATH=/abc`:
 
 ```bash
-./kyanos stat http --slow --path /abc
+./claudeinsight stat http --slow --path /abc
 ```
 
-By default, Kyanos will collect data for 10 seconds (modifiable with the
+By default, claudeinsight will collect data for 10 seconds (modifiable with the
 `--time` option, or press `ctrl+c` to stop early):
-![kyanos stat slow result](/qs-stat-slow.jpg)
+![ClaudeInsight stat slow result](/qs-stat-slow.jpg)
 
 After 10 seconds, the collected results are displayed in a table:
 

@@ -2,8 +2,8 @@ package common
 
 import (
 	"encoding/json"
-	"kyanos/bpf"
-	"kyanos/common"
+	"claudeinsight/bpf"
+	"claudeinsight/common"
 	"time"
 )
 

@@ -1,6 +1,6 @@
 package protocol
 
-import "kyanos/bpf"
+import "claudeinsight/bpf"
 
 type LatencyFilter struct {
 	MinLatency float64

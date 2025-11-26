@@ -1,6 +1,6 @@
 package main
 
-import "kyanos/cmd"
+import "claudeinsight/cmd"
 
 func main() {
 	cmd.Execute()

@@ -3,9 +3,9 @@ package analysis
 import (
 	"fmt"
 
-	anc "kyanos/agent/analysis/common"
-	"kyanos/agent/protocol"
-	"kyanos/bpf"
+	anc "claudeinsight/agent/analysis/common"
+	"claudeinsight/agent/protocol"
+	"claudeinsight/bpf"
 )
 
 type Classfier func(*anc.AnnotatedRecord) (anc.ClassId, error)
@@ -38,22 +38,9 @@ func init() {
 			return anc.ClassId(httpReq.Path), nil
 		}
 	}
-	classfierMap[anc.RedisCommand] = func(ar *anc.AnnotatedRecord) (anc.ClassId, error) {
-		redisReq, ok := ar.Record.Request().(*protocol.RedisMessage)
-		if !ok {
-			return "_not_a_redis_req_", nil
-		} else {
-			return anc.ClassId(redisReq.Command()), nil
-		}
-	}
 
 	classfierMap[anc.ProtocolAdaptive] = func(ar *anc.AnnotatedRecord) (anc.ClassId, error) {
-		redisReq, ok := ar.Record.Request().(*protocol.RedisMessage)
-		if !ok {
-			return "_not_a_redis_req_", nil
-		} else {
-			return anc.ClassId(redisReq.Command()), nil
-		}
+		return anc.ClassId(ar.RemoteAddr.String()), nil
 	}
 
 	classIdHumanReadableMap = make(map[anc.ClassfierType]ClassIdAsHumanReadable)
@@ -75,14 +62,6 @@ func init() {
 			return "_not_a_http_req_"
 		} else {
 			return httpReq.Path
-		}
-	}
-	classIdHumanReadableMap[anc.RedisCommand] = func(ar *anc.AnnotatedRecord) string {
-		redisReq, ok := ar.Record.Request().(*protocol.RedisMessage)
-		if !ok {
-			return "_not_a_redis_req_"
-		} else {
-			return redisReq.Command()
 		}
 	}
 

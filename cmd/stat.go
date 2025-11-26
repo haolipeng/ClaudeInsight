@@ -2,9 +2,9 @@ package cmd
 
 import (
 	"fmt"
-	anc "kyanos/agent/analysis/common"
-	"kyanos/bpf"
-	"kyanos/common"
+	anc "claudeinsight/agent/analysis/common"
+	"claudeinsight/bpf"
+	"claudeinsight/common"
 	"slices"
 	"strings"
 
@@ -16,16 +16,16 @@ var statCmd = &cobra.Command{
 	Short: "Analysis connections statistics. Aggregate metrics such as latency and size for request-response pairs.",
 	Example: `
 # Basic Usage, only count HTTP connections, print results when press 'ctlc+c' 
-sudo kyanos stat http
+sudo claudeinsight stat http
 
 # Find the most slowly remote http server with '/example' api
-sudo kyanos stat http --metrics tolal-time --group-by remote-ip --side client --path /example
+sudo claudeinsight stat http --metrics tolal-time --group-by remote-ip --side client --path /example
 
 # Same as above but shorter
-sudo kyanos stat http --slow --path /example
+sudo claudeinsight stat http --slow --path /example
 
 # find the the remote client which requests big keys
-sudo kyanos stat redis --bigresp
+sudo claudeinsight stat redis --bigresp
 	`,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) { Mode = AnalysisMode },
 	Run: func(cmd *cobra.Command, args []string) {
@@ -103,8 +103,6 @@ func createAnalysisOptions() (anc.AnalysisOptions, error) {
 	options.ProtocolSpecificClassfiers = make(map[bpf.AgentTrafficProtocolT]anc.ClassfierType)
 	// currently only set it hardly
 	options.ProtocolSpecificClassfiers[bpf.AgentTrafficProtocolTKProtocolHTTP] = anc.HttpPath
-	options.ProtocolSpecificClassfiers[bpf.AgentTrafficProtocolTKProtocolRedis] = anc.RedisCommand
-	options.ProtocolSpecificClassfiers[bpf.AgentTrafficProtocolTKProtocolMySQL] = anc.RemoteIp
 	options.TimeLimit = timeLimit
 
 	options.Overview = overview

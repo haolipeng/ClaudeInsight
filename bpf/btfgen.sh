@@ -8,9 +8,9 @@ BTFHUB_REPO="https://github.com/aquasecurity/btfhub.git"
 BTFHUB_ARCH_REPO="https://github.com/aquasecurity/btfhub-archive.git"
 
 
-KYANOS_BPF_CORE="${BASEDIR}/bpf/agent_$2_bpfel.o"
-KYANOS_BPF_CORE_FOR_LEGACY_KERNEL="${BASEDIR}/bpf/agentlagacykernel310_$2_bpfel.o"
-KYANOS_BPF_CORE_GOTLS="${BASEDIR}/bpf/gotls_$2_bpfel.o"
+CLAUDE_INSIGHT_BPF_CORE="${BASEDIR}/bpf/agent_$2_bpfel.o"
+CLAUDE_INSIGHT_BPF_CORE_FOR_LEGACY_KERNEL="${BASEDIR}/bpf/agentlagacykernel310_$2_bpfel.o"
+CLAUDE_INSIGHT_BPF_CORE_GOTLS="${BASEDIR}/bpf/gotls_$2_bpfel.o"
 
 BTFHUB_DIR="${BASEDIR}/deps/btfhub"
 BTFHUB_ARCH_DIR="${BASEDIR}/deps/btfhub-archive"
@@ -55,7 +55,7 @@ CMDS="rsync git cp rm mv"
 for cmd in ${CMDS}; do
     command -v $cmd 2>&1 >/dev/null || die "cmd ${cmd} not found"
 done
-[ ! -f ${KYANOS_BPF_CORE} ] && die "kyanos CO-RE obj not found: ${KYANOS_BPF_CORE}"
+[ ! -f ${CLAUDE_INSIGHT_BPF_CORE} ] && die "claudeinsight CO-RE obj not found: ${CLAUDE_INSIGHT_BPF_CORE}"
 
 [ ! -d ${BTFHUB_DIR} ] && git clone "${BTFHUB_REPO}" ${BTFHUB_DIR}
 [ ! -d ${BTFHUB_ARCH_DIR} ] && git clone --depth=1 "${BTFHUB_ARCH_REPO}" ${BTFHUB_ARCH_DIR}
@@ -87,7 +87,7 @@ rsync -avz \
 rm -rf ${BASEDIR}/bpf/custom-archive/* || true
 
 [ ! -f ./tools/btfgen.sh ] && die "could not find btfgen.sh"
-./tools/btfgen.sh -a $1 -o ${KYANOS_BPF_CORE} -o ${KYANOS_BPF_CORE_FOR_LEGACY_KERNEL} -o ${KYANOS_BPF_CORE_GOTLS}
+./tools/btfgen.sh -a $1 -o ${CLAUDE_INSIGHT_BPF_CORE} -o ${CLAUDE_INSIGHT_BPF_CORE_FOR_LEGACY_KERNEL} -o ${CLAUDE_INSIGHT_BPF_CORE_GOTLS}
 
 # move tailored BTFs to dist
 mv ./custom-archive/* ${BASEDIR}/bpf/custom-archive

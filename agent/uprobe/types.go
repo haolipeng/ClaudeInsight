@@ -2,8 +2,8 @@ package uprobe
 
 import (
 	"fmt"
-	"kyanos/bpf"
-	"kyanos/common"
+	"claudeinsight/bpf"
+	"claudeinsight/common"
 
 	"github.com/cilium/ebpf"
 )

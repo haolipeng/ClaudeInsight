@@ -3,7 +3,7 @@
 set -ex
 
 CMD="$1"
-FILE_PREFIX="/tmp/kyanos"
+FILE_PREFIX="/tmp/claudeinsight"
 HTTP_PLAIN_CLIENT_LNAME="${FILE_PREFIX}_http_plain_client.log"
 
 function test_http_plain_client() {

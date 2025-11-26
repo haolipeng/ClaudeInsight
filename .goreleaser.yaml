@@ -7,7 +7,7 @@
 # vim: set ts=2 sw=2 tw=0 fo=cnqoj
 
 version: 2
-project_name: kyanos
+project_name: claudeinsight
 before:
   hooks:
     - wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -
@@ -18,8 +18,8 @@ before:
     - git submodule update --init --recursive
 
 builds:
-  - id: kyanos-arm64
-    binary: kyanos
+  - id: claudeinsight-arm64
+    binary: claudeinsight
     env:
       - CGO_ENABLED=1
       - CC=aarch64-linux-gnu-gcc
@@ -28,9 +28,9 @@ builds:
     ldflags:
       - -s
       - -w
-      - -X "kyanos/version.Version={{.Version}}"
-      - -X "kyanos/version.CommitID={{.Commit}}"
-      - -X "kyanos/version.BuildTime={{.Date}}"
+      - -X "claudeinsight/version.Version={{.Version}}"
+      - -X "claudeinsight/version.CommitID={{.Commit}}"
+      - -X "claudeinsight/version.BuildTime={{.Date}}"
       - -linkmode 'external'
       - -extldflags "-static"
     goos:
@@ -44,8 +44,8 @@ builds:
         - bash -c 'sudo make btfgen BUILD_ARCH=arm64 ARCH_BPF_NAME=arm64' 
 
 
-  - id: kyanos-amd64
-    binary: kyanos
+  - id: claudeinsight-amd64
+    binary: claudeinsight
     env:
       - CGO_ENABLED=1
       - CC=gcc
@@ -55,9 +55,9 @@ builds:
     ldflags:
       - -s
       - -w
-      - -X "kyanos/version.Version={{.Version}}"
-      - -X "kyanos/version.CommitID={{.Commit}}"
-      - -X "kyanos/version.BuildTime={{.Date}}"
+      - -X "claudeinsight/version.Version={{.Version}}"
+      - -X "claudeinsight/version.CommitID={{.Commit}}"
+      - -X "claudeinsight/version.BuildTime={{.Date}}"
       - -linkmode 'external'
       - -extldflags "-static"
     goos:
@@ -72,8 +72,8 @@ builds:
 
 archives:
   - builds:
-      - kyanos-arm64
-      - kyanos-amd64
+      - claudeinsight-arm64
+      - claudeinsight-amd64
 
 checksum:
   name_template: 'checksums.txt'

@@ -1,7 +1,7 @@
 package bpf
 
 import (
-	"kyanos/common"
+	"claudeinsight/common"
 	"net"
 	"reflect"
 

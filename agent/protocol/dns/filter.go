@@ -1,8 +1,8 @@
 package dns
 
 import (
-	"kyanos/agent/protocol"
-	"kyanos/bpf"
+	"claudeinsight/agent/protocol"
+	"claudeinsight/bpf"
 	"strings"
 )
 

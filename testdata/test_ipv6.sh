@@ -3,12 +3,12 @@
 set -ex
 
 CMD="$1"
-FILE_PREFIX="/tmp/kyanos"
+FILE_PREFIX="/tmp/claudeinsight"
 CLIENT_LNAME="${FILE_PREFIX}_ipv6_client.log"
 
 
 function test_client() {
-    # client start after kyanos
+    # client start after claudeinsight
     timeout 30 ${CMD} watch --debug-output http --comm curl --trace-ssl-event=false 2>&1 | tee "${CLIENT_LNAME}" &
     sleep 15
     curl -6 'http://ipv6.baidu.com'  &>/dev/null || true

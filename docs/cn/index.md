@@ -3,33 +3,33 @@
 layout: home
 
 hero:
-  name: "Kyanos"
+  name: "ClaudeInsight"
   text: "A Simple & Powerful Network Tracing Tool"
   tagline: 秒级分析定位网络问题
   image:
-    src: /kyanos.png
-    alt: Kyanos
+    src: /ClaudeInsight.png
+    alt: ClaudeInsight
   actions:
     - theme: brand
-      text: What is Kyanos?
-      link: ./what-is-kyanos
+      text: What is ClaudeInsight?
+      link: ./what-is-ClaudeInsight
     - theme: alt
       text: Quickstart
       link: ./quickstart
     - theme: alt
       text: Star me at Github!
-      link: https://github.com/hengyoush/kyanos
+      link: https://github.com/hengyoush/ClaudeInsight
 
 features:
   - icon: 🚀
     title: 使用简单
-    details: 聚焦于7层协议，只需一条命令即可快速查看应用的网络性能，包括MySQL、Redis等常用服务的网络延迟和数据传输大小
+    details: 聚焦于7层协议，只需一条命令即可快速查看应用的网络性能，包括HTTP等常用服务的网络延迟和数据传输大小
     link: ./how-to
-    linkText: Learn how to use kyanos
+    linkText: Learn how to use ClaudeInsight
   - icon: 🎯️
     title: 高级数据过滤
     details:
-      支持根据协议字段（如HTTP的Path或Redis的Command）过滤数据，以及根据进程PID、容器ID、K8s
+      支持根据协议字段（如HTTP的Path）过滤数据，以及根据进程PID、容器ID、K8s
       Pod名称等多维度筛选数据，提供更精确的问题定位。
     link: ./watch#how-to-filter
     linkText: Learn how to filter traffic
@@ -47,10 +47,10 @@ features:
     title: 直观的用户界面
     details: 基于命令行就地分析，提供可视化的输出，无需复杂的文件下载和分析步骤。
     link: ./how-to
-    linkText: Learn how to use kyanos
+    linkText: Learn how to use ClaudeInsight
   - icon: 🌐️
     title: 轻量级与兼容性
-    details: Kyanos作为一个网络问题排查工具，不依赖于任何外部依赖，能够在从3.10版本到最新版本的内核上运行
+    details: ClaudeInsight作为一个网络问题排查工具，不依赖于任何外部依赖，能够在从3.10版本到最新版本的内核上运行
     link: ./quickstart#prerequire
-    linkText: Install kyanos
+    linkText: Install ClaudeInsight
 ---

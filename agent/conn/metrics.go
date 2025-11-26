@@ -1,7 +1,7 @@
 package conn
 
 import (
-	"kyanos/monitor"
+	"claudeinsight/monitor"
 	"sync/atomic"
 )
 

@@ -5,7 +5,7 @@ prev: false
 
 # 编译步骤
 
-本文介绍 kyanos 的本地编译方法，我的环境是 ubuntu
+本文介绍 claudeinsight 的本地编译方法，我的环境是 ubuntu
 22.04，其他环境可能会有所不同。
 
 ## 工具版本要求
@@ -22,7 +22,7 @@ prev: false
 20.04 以及更新版本，可以使用一条命令即可完成编译环境的初始化。
 
 ```
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/hengyoush/kyanos/refs/heads/main/init_env.sh)"
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/hengyoush/ClaudeInsight/refs/heads/main/init_env.sh)"
 ```
 
 ### 其他 Linux 发行版
@@ -30,8 +30,8 @@ prev: false
 用下面的命令 clone 项目:
 
 ```bash
-git clone https://github.com/hengyoush/kyanos
-cd kyanos
+git clone https://github.com/hengyoush/ClaudeInsight
+cd ClaudeInsight
 git submodule update --init --recursive
 ```
 
@@ -50,7 +50,7 @@ git submodule update --init --recursive
 make build-bpf && make
 ```
 
-之后在项目根目录下会生成 kyanos 可执行文件。
+之后在项目根目录下会生成 claudeinsight 可执行文件。
 
 格式化代码
 
@@ -68,7 +68,7 @@ make format-md
 >
 > 但是需要注意的是该二进制文件中没有包含
 > [btfhub-archive](https://github.com/aquasecurity/btfhub-archive/)
-> 中的 btf 文件，如果直接拿这个 kyanos 去没有开启 BTF 支持的低版本内核上执行可能会启动失败，通过下面的命令可以构建出一个内嵌 btf 文件的 kyanos 产物：
+> 中的 btf 文件，如果直接拿这个 claudeinsight 去没有开启 BTF 支持的低版本内核上执行可能会启动失败，通过下面的命令可以构建出一个内嵌 btf 文件的 claudeinsight 产物：
 >
 > ::: code-group
 >
@@ -86,7 +86,7 @@ make format-md
 
 > [!TIP]
 >
-> 如果你的内核没有开启 BTF，你可能无法成功启动 kyanos.
+> 如果你的内核没有开启 BTF，你可能无法成功启动 ClaudeInsight.
 >
 > 检查是否开启 BTF：
 >
@@ -97,5 +97,5 @@ make format-md
 > 如果结果是 `CONFIG_DEBUG_INFO_BTF=y` 说明开启了，如果没开启请到
 > [mirrors.openanolis.cn](https://mirrors.openanolis.cn/coolbpf/btf/) or
 > [btfhub-archive](https://github.com/aquasecurity/btfhub-archive/)
-> 上下载对应你的内核版本的 btf 文件，然后启动 kyanos 时使用 `--btf`
+> 上下载对应你的内核版本的 btf 文件，然后启动 claudeinsight 时使用 `--btf`
 > 选项指定下载的 btf 文件。

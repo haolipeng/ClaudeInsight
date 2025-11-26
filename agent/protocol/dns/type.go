@@ -3,7 +3,7 @@ package dns
 import (
 	"encoding/json"
 	"fmt"
-	"kyanos/agent/protocol"
+	"claudeinsight/agent/protocol"
 )
 
 //-----------------------------------------------------------------------------

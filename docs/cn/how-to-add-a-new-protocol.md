@@ -1,19 +1,19 @@
-# 如何为 kyanos 贡献新的协议
+# 如何为 claudeinsight 贡献新的协议
 
 ## 背景
 
-kyanos 需要捕获协议消息组成请求响应对以供终端展示，因此 kyanos 需要每个协议的协议解析代码，目前支持 HTTP、MySQL 和 Redis，将来会支持更多。本文将阐述 kyanos 协议解析的整体架构，以协助开发新的协议。
+claudeinsight 需要捕获协议消息组成请求响应对以供终端展示，因此 claudeinsight 需要每个协议的协议解析代码，目前支持 HTTP、DNS，将来会支持更多。本文将阐述 claudeinsight 协议解析的整体架构，以协助开发新的协议。
 
 ## 协议解析流程总览
 
-![kyanos protocol parse flow](/protocol-parse-flow.png)
+![ClaudeInsight protocol parse flow](/protocol-parse-flow.png)
 
-从左边看起，kyanos 在 read、write 等系统调用上插桩，获取应用进程读写的数据，将其通过 perf
+从左边看起，ClaudeInsight 在 read、write 等系统调用上插桩，获取应用进程读写的数据，将其通过 perf
 event buffer 发送到用户空间。
 
 用户空间则根据这个连接是客户端侧还是服务端侧，分别放到 reqStreamBuffer 或者 respStreamBuffer 里。这些数据是单纯的应用协议数据，没有协议头。
 
-kyanos 会使用相应协议的解析器解析放到 streamBuffer 的数据，然后关联解析后的请求和响应，最后根据协议的需要再进行 Full
+claudeinsight 会使用相应协议的解析器解析放到 streamBuffer 的数据，然后关联解析后的请求和响应，最后根据协议的需要再进行 Full
 Body 解析，生成一个“记录”（record）。
 
 ## 一些术语
@@ -21,7 +21,7 @@ Body 解析，生成一个“记录”（record）。
 Message：协议的最基本数据单元，通常有一个 header 和 body。
 
 Request /
-Response: 请求或响应由一起发送的一个或多个 Message 组成，这些 Message 在一起表示一个消息（_Note: 对于简单的协议比如 HTTP1.1 来说，一个 Request/Response 可能只对应一个 Message，但对于像 MySQL 这种复杂的协议，多个 Message 组合起来才对应一个 Request/Response_）
+Response: 请求或响应由一起发送的一个或多个 Message 组成，这些 Message 在一起表示一个消息（_Note: 对于简单的协议比如 HTTP1.1 来说，一个 Request/Response 可能只对应一个 Message，但对于复杂的协议，多个 Message 组合起来才对应一个 Request/Response_）
 
 Record：Record 代表一个匹配完成的请求响应对。
 
@@ -39,19 +39,18 @@ Record：Record 代表一个匹配完成的请求响应对。
 
 ## Step.1-定义协议消息类型
 
-在/agent/protocol 目录下新建一个目录，名称为协议名称，例如：kafka。
+在/agent/protocol 目录下新建一个目录，名称为协议名称，例如：redis。
 
 ### 定义 Message
 
-一般来说，你要实现的协议会存在一个通用的 Header，这个 Header 会包含一些元数据，比如一个标志位记录其是请求还是响应，像这些信息你需要存储到你定义的 Message 的字段里，比如 MySQL 协议定义的：
+一般来说，你要实现的协议会存在一个通用的 Header，这个 Header 会包含一些元数据，比如一个标志位记录其是请求还是响应，像这些信息你需要存储到你定义的 Message 的字段里。例如：
 
 ```go
-type MysqlPacket struct {
+type ProtocolFrame struct {
 	FrameBase
-	seqId byte
-	msg   string
-	cmd   int
-	isReq bool
+	requestCode int16
+	msg         string
+	isReq       bool
 }
 ```
 
@@ -142,7 +141,7 @@ ParseStream(streamBuffer *buffer.StreamBuffer, messageType MessageType) ParseRes
 函数获取到目前为止已接收到的缓冲区前面的所有连续数据。因此，此时
 **无法保证数据有效或缓冲区与数据包的开头对齐**。
 
-如果返回 `ParseResult` 中的 `state` 为 `success`，且那么 kyanos 会自动删除掉
+如果返回 `ParseResult` 中的 `state` 为 `success`，且那么 claudeinsight 会自动删除掉
 `ParseResult.ReadBytes` 个字节的数据；如果返回 `invalid`，那么通过
 `FindBoundary` 找到下一个可能的 `Message` 边界；如果返回
 `needsMoreData`，则不会删除数据，而是稍后重试。
@@ -162,18 +161,18 @@ id，那么响应带有相同 request id 的可能性非常高。
 
 ParseStream 解析成功的 Message 会放到对应的 ReqQueue 和 RespQueue 中，然后再它们匹配在一起创建 Record，主要有两种匹配方法：基于顺序 和 基于标签。
 
-HTTP 等协议使用顺序匹配，而 Kafka 等协议使用基于标签的匹配。
+HTTP 等协议使用顺序匹配，而其他协议可能使用基于标签的匹配。
 
 Note: 如果是使用顺序匹配，可以直接使用 `matchByTimestamp`。
 
 ### Full Body Parsing 解析整个消息
 
 目前，Full Body
-Parsing 是 Match 的一部分。对于大多数协议，我们如果需要解析整个消息体，只有在请求响应匹配之后才可以，比如 Kafka 需要知道请求的 opcode，然后才可以根据 opcode 解析响应。
+Parsing 是 Match 的一部分。对于大多数协议，我们如果需要解析整个消息体，只有在请求响应匹配之后才可以，某些协议需要知道请求的 opcode，然后才可以根据 opcode 解析响应。
 
 ## Step.3-实现协议推断
 
-在将内核数据抓取到用户态解析之前，我们需要识别出这个流量是什么协议的流量，当连接开启上面有数据传输时，kyanos 会基于一些规则判断该流量术语哪种协议，每个协议有自己的规则，HTTP 协议如下：
+在将内核数据抓取到用户态解析之前，我们需要识别出这个流量是什么协议的流量，当连接开启上面有数据传输时，ClaudeInsight 会基于一些规则判断该流量术语哪种协议，每个协议有自己的规则，HTTP 协议如下：
 
 ```c
 static __always_inline enum message_type_t is_http_protocol(const char *old_buf, size_t count) {
@@ -254,7 +253,7 @@ func init() {
 ### 添加 e2e 测试
 
 在 testdata 目录下添加对应协议的 e2e 测试，可以参考其他协议的写法（比如
-`test_redis.sh` 等）。
+`test_dns.sh` 等）。
 
 然后在 ./github/workflows/test.yml 中添加你的测试步骤：
 
@@ -267,10 +266,10 @@ func init() {
             set -ex
             uname -a
             cat /etc/issue
-            if [ -f "/var/lib/kyanos/btf/current.btf" ]; then
-                bash /host/testdata/YOUR_TEST_SCRIPT.sh 'sudo /host/kyanos/kyanos $kyanos_log_option --btf /var/lib/kyanos/btf/current.btf'
+            if [ -f "/var/lib/ClaudeInsight/btf/current.btf" ]; then
+                bash /host/testdata/YOUR_TEST_SCRIPT.sh 'sudo /host/ClaudeInsight/ClaudeInsight $ClaudeInsight_log_option --btf /var/lib/ClaudeInsight/btf/current.btf'
             else
-                bash /host/testdata/YOUR_TEST_SCRIPT.sh 'sudo /host/kyanos/kyanos $kyanos_log_option'
+                bash /host/testdata/YOUR_TEST_SCRIPT.sh 'sudo /host/ClaudeInsight/ClaudeInsight $ClaudeInsight_log_option'
             fi
 ```
 
@@ -296,8 +295,8 @@ Hint: 一开始可以将你的测试放在 workflow 的前面，这样能很快�
 
 ### 协议解析持久化信息
 
-在某些协议中，如果需要在解析过程中保留一些数据（比如 kafka 中，它存储了请求缓冲区上看到的所有 correlation_id 的集合，而 FindBoundary 只返回 respStreamBuffer 上之前看到 correlation_id 的位置。）可以在协议的 Parser 里自定义一些变量保存（即 Parser 可以是有状态的），**kyanos 会为每个连接开启时创建独立的 Parser 并保持到连接关闭**。
+在某些协议中，如果需要在解析过程中保留一些数据（例如存储请求缓冲区上看到的所有 correlation_id 的集合，而 FindBoundary 只返回 respStreamBuffer 上之前看到 correlation_id 的位置。）可以在协议的 Parser 里自定义一些变量保存（即 Parser 可以是有状态的），**ClaudeInsight 会为每个连接开启时创建独立的 Parser 并保持到连接关闭**。
 
 ## 总结
 
-恭喜你成功向 Kyanos 添加新协议！由于你的贡献，新的协议解析器将使许多其他人受益！
+恭喜你成功向 claudeinsight 添加新协议！由于你的贡献，新的协议解析器将使许多其他人受益！

@@ -1,10 +1,10 @@
 package loader
 
 import (
+	"claudeinsight/agent/common"
+	c "claudeinsight/common"
 	"context"
 	"fmt"
-	"kyanos/agent/common"
-	c "kyanos/common"
 	"os"
 	"strings"
 	"time"
@@ -86,9 +86,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m model) View() string {
 	var s string
 	if m.quitting {
-		s += "Kyanos exited."
+		s += "ClaudeInsightAsset exited."
 	} else {
-		s += m.spinner.View() + "🦜 Kyanos Loading..."
+		s += m.spinner.View() + "ClaudeInsightAsset Loading..."
 	}
 
 	s += "\n\n"

@@ -3,9 +3,9 @@ package analysis
 import (
 	"cmp"
 	"context"
-	analysis_common "kyanos/agent/analysis/common"
-	"kyanos/agent/protocol"
-	"kyanos/common"
+	analysis_common "claudeinsight/agent/analysis/common"
+	"claudeinsight/agent/protocol"
+	"claudeinsight/common"
 	"math"
 	"slices"
 	"time"

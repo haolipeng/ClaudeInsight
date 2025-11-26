@@ -1,19 +1,17 @@
 package cmd
 
 import (
+	"claudeinsight/agent"
+	ac "claudeinsight/agent/common"
+	"claudeinsight/agent/protocol"
+	"claudeinsight/common"
 	"fmt"
-	"kyanos/agent"
-	ac "kyanos/agent/common"
-	"kyanos/agent/protocol"
-	"kyanos/common"
 	"os"
 
-	"github.com/go-logr/logr"
 	"github.com/jefurry/logrus"
 	"github.com/sevlyar/go-daemon"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"k8s.io/klog/v2"
 )
 
 type ModeEnum int
@@ -64,22 +62,15 @@ func startAgent() {
 	options.PerfEventBufferSizeForEvent = KernEvtPerfEventBufferSize
 	options.PerfEventBufferSizeForData = DataEvtPerfEventBufferSize
 
-	options.ContainerdEndpoint = ContainerdEndpoint
-	options.DockerEndpoint = DockerEndpoint
-	options.CriRuntimeEndpoint = CriRuntimeEndpoint
-	options.ContainerId = ContainerId
-	options.ContainerName = ContainerName
-	options.PodName = PodName
-
 	ac.Options = &options
 
 	InitLog()
-	common.AgentLog.Infoln("Kyanos starting...")
+	common.AgentLog.Infoln("ClaudeInsightAsset starting...")
 	if viper.GetBool(common.DaemonVarName) {
 		cntxt := &daemon.Context{
-			PidFileName: "./kyanos.pid",
+			PidFileName: "./claudeinsight.pid",
 			PidFilePerm: 0644,
-			LogFileName: "./kyanos.log",
+			LogFileName: "./claudeinsight.log",
 			LogFilePerm: 0640,
 			WorkDir:     "./",
 			// Umask:       027,
@@ -90,12 +81,12 @@ func startAgent() {
 			logger.Fatal("Unable to run: ", err)
 		}
 		if d != nil {
-			logger.Println("Kyanos started!")
+			logger.Println("ClaudeInsightAsset started!")
 			return
 		}
 		defer cntxt.Release()
 		logger.Println("----------------------")
-		logger.Println("Kyanos started!")
+		logger.Println("ClaudeInsightAsset started!")
 		agent.SetupAgent(options)
 	} else {
 		agent.SetupAgent(options)
@@ -160,15 +151,6 @@ func InitLog() {
 	}
 	if isValidLogLevel(UprobeLogLevel) {
 		common.UprobeLog.SetLevel(logrus.Level(UprobeLogLevel))
-	}
-
-	switch common.AgentLog.Level {
-	case logrus.InfoLevel:
-		fallthrough
-	case logrus.DebugLevel:
-		break
-	default:
-		klog.SetLogger(logr.Discard())
 	}
 }
 

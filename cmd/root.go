@@ -1,10 +1,8 @@
 package cmd
 
 import (
+	"claudeinsight/common"
 	"fmt"
-	"kyanos/agent/metadata/k8s"
-	"kyanos/common"
-	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -13,23 +11,21 @@ import (
 var logger *common.Klogger = common.DefaultLog
 
 var rootCmd = &cobra.Command{
-	Use: `kyanos <command> [flags]`,
-	Short: "Kyanos is a command-line tool for monitoring, troubleshooting, and analyzing network issues using eBPF. \n" +
+	Use: `claudeinsight <command> [flags]`,
+	Short: "ClaudeInsightAsset is a command-line tool for monitoring, troubleshooting, and analyzing network issues using eBPF. \n" +
 		"It helps you quickly diagnose network-related problems in realtime," +
 		" such as slow queries, high traffic, and other anomalies.\n" +
-		"More info: https://github.com/hengyoush/kyanos",
+		"More info: https://github.com/hengyoush/ClaudeInsight",
 	CompletionOptions: cobra.CompletionOptions{
 		DisableDefaultCmd: true,
 	},
 	DisableFlagsInUseLine: true,
 	Example: `
-sudo kyanos
-sudo kyanos watch http --pids 1234 --path /foo/bar
-sudo kyanos watch redis --comands GET,SET
-sudo kyanos watch mysql --latency 100
+sudo claudeinsight
+sudo claudeinsight watch http --pids 1234 --path /foo/bar
 
-sudo kyanos stat http --metrics total-time
-sudo kyanos stat http --metrics total-time --group-by remote-ip`,
+sudo claudeinsight stat http --metrics total-time
+sudo claudeinsight stat http --metrics total-time --group-by remote-ip`,
 	Run: func(cmd *cobra.Command, args []string) {
 		startAgent()
 	},
@@ -52,12 +48,6 @@ var BPFEventLogLevel int32
 var ConntrackLogLevel int32
 var ProtocolLogLevel int32
 var UprobeLogLevel int32
-var DockerEndpoint string
-var ContainerdEndpoint string
-var CriRuntimeEndpoint string
-var ContainerId string
-var ContainerName string
-var PodName string
 
 func init() {
 	rootCmd.PersistentFlags().StringSliceVarP(&FilterPids, "pids", "p", []string{}, "Filter by pids, seperate by ','")
@@ -76,19 +66,6 @@ func init() {
 	rootCmd.PersistentFlags().Int32Var(&ConntrackLogLevel, "conntrack-log-level", 0, "specify conntrack module log level individually")
 	rootCmd.PersistentFlags().Int32Var(&ProtocolLogLevel, "protocol-log-level", 0, "specify protocol module log level individually")
 	rootCmd.PersistentFlags().Int32Var(&UprobeLogLevel, "uprobe-log-level", 0, "specify uprobe module log level individually")
-
-	// container
-	rootCmd.PersistentFlags().StringVar(&ContainerId, "container-id", "", "Filter by container id (only TCP and UDP packets are supported)")
-	rootCmd.PersistentFlags().StringVar(&ContainerName, "container-name", "", "Filter by container name (only TCP and UDP packets are supported)")
-	rootCmd.PersistentFlags().StringVar(&PodName, "pod-name", "", "Filter by pod name (format: NAME.NAMESPACE, only TCP and UDP packets are supported)")
-	rootCmd.PersistentFlags().StringVar(&DockerEndpoint, "docker-address", "unix:///var/run/docker.sock",
-		`Address of Docker Engine service`)
-	rootCmd.PersistentFlags().StringVar(&ContainerdEndpoint, "containerd-address", "/run/containerd/containerd.sock",
-		`Address of containerd service`)
-	rootCmd.PersistentFlags().StringVar(&CriRuntimeEndpoint, "cri-runtime-address", "",
-		"Address of CRI container runtime service "+
-			fmt.Sprintf("(default: uses in order the first successful one of [%s])",
-				strings.Join(getDefaultCriRuntimeEndpoint(), ", ")))
 
 	// pageNum of eBPF map
 	rootCmd.PersistentFlags().IntVar(&options.SyscallPerfEventMapPageNum, "syscall-perf-event-map-page-num", 2048, "pageNum of eBPF map size for syscall data events buffer")
@@ -133,12 +110,4 @@ func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
 	}
-}
-
-func getDefaultCriRuntimeEndpoint() []string {
-	var rs []string
-	for _, end := range k8s.DefaultRuntimeEndpoints {
-		rs = append(rs, strings.TrimPrefix(end, "unix://"))
-	}
-	return rs
 }

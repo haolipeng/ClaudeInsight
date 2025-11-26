@@ -1,0 +1,85 @@
+---
+next:
+  text: "快速开始"
+  link: "./quickstart"
+prev: false
+---
+
+# claudeinsight 是什么？{#what-is-ClaudeInsight}
+
+claudeinsight 是一个基于 eBPF 的网络问题分析工具，你可以用它来抓取业务请求，比如 HTTP 请求等，还可以帮你分析异常链路，快速排查业务故障，而不需要繁琐的抓包，下载，分析等步骤，并且拥有良好的兼容性，大多数情况下无需任何依赖一行命令即可开始分析。
+
+## 你为什么应该使用 ClaudeInsight?
+
+> 现在已经有很多网络排查工具了比如 tcpdump，iftop，netstat 等，那么 claudeinsight 有什么优势呢？
+
+### 传统的 tcpdump 抓包排查的缺点
+
+1. 难以根据协议特定信息过滤，以 HTTP 协议为例，很难做到根据特定 HTTP
+   Path 抓包，必须依赖 wireshark/tshark 这类工具进行二次过滤。
+2. 难以根据数据包收发的进程过滤，尤其在一个机器上部署多个进程的时候，只需要抓取某个业务进程的数据包。
+3. 排查效率较低，一般排查流程：首先是进入生产环境使用 tcpdump 抓包生成 pcap 文件，然后需要下载到本地再通过 wireshark 工具分析，往往消耗了大量时间。
+4. 较弱的分析能力，tcpdump 只提供底层的抓包能力，几乎不具备高阶的分析能力，必须要和 wireshark 搭配使用，而传统的网络监控工具比如 iftop 和 nestat 只能提供粗粒度的监控，想要排查根因很难。
+5. 加密的流量比如使用 SSL 协议的请求无法看到明文。
+
+### claudeinsight 能为你带来的
+
+1. **强大的流量过滤功能**：不仅可以根据传统 IP/端口 等信息过滤，还支持根据：进程、L7 协议信息、请求/响应字节数、耗时等过滤你想要的数据。
+
+```bash
+# 根据 pid 过滤
+./claudeinsight watch --pids 1234
+# 根据响应字节数过滤
+./claudeinsight watch --resp-size 10000
+```
+
+2. **强大的分析功能**： 和 tcpdump 只提供细粒度的抓包功能不同，ClaudeInsight 还支持以各种维度聚合抓取的数据包的指标信息，快速得到对排查问题最有用的关键数据。想象一下你的 HTTP 服务的带宽突然被打满，你该如何快速的分析是
+   `哪些 ip` 的 `哪些请求` 造成的？  
+   使用 claudeinsight 只需要一行命令：`claudeinsight stat http --bigresp` 即可找到发送给哪些远程 ip 的响应字节数最大，并且还能够发现请求响应的具体数据。
+   ![ClaudeInsight find big response](/whatClaudeInsight.gif)
+3. **深入内核的耗时细节**：在实际业务场景中我们经常遇到远程服务慢查询问题，但是
+   **具体慢在哪里**
+   在传统监控方式下很难给出确切答案。而 claudeinsight 提供了 请求/响应 到达网卡以及从 内核 Socket 缓冲区读取的内核埋点，并且以可视化的图形展示出来，你可以方便的判断是哪一个环节出现了问题。
+   ![ClaudeInsight time detail](/timedetail.jpg)
+4. **轻量级零依赖**：几乎 0 依赖，只需要单个二进制文件，一行命令，所有结果都展示在命令行中。
+5. **SSL 流量自动解密**：ClaudeInsight 为你抓取的请求响应结果全部都是明文。
+
+## 什么时候你会使用 claudeinsight {#use-cases}
+
+- **抓取请求响应**
+
+claudeinsight 提供了 watch 命令可以帮助你过滤抓取各种流量，它支持根据进程 id 以及 IP、端口过滤，也支持根据协议特定的字段过滤，比如 HTTP PATH 过滤。抓取的流量不仅仅包含请求响应的具体内容，还包括耗时的细节，比如请求从系统调用到网卡，再到响应从网卡到 socket 缓冲区再到进程去读取它，这些耗时细节你全部都能得到。
+
+- **分析异常链路**
+
+claudeinsight 的 stat 命令可以帮你快速找到异常链路，stat 命令支持根据多种维度聚合，比如 claudeinsight 支持根据远程 ip 聚合，让你可以快速分析出是哪一个远程 ip 更慢；另外 claudeinsight 支持各种指标的统计，比如请求响应耗时、请求响应大小等。结合以上两点，80%的业务网络异常问题都可以快速定位。
+
+- **全局依赖分析** <Badge type="tip" text="beta" />
+
+有时候你想知道整个机器依赖哪些外部资源，ClaudeInsight 提供了 overview 命令帮你一键抓取整个机器依赖的外部资源及其耗时情况。
+
+## 基础示例
+
+**抓取 HTTP 流量并且获取耗时细节**
+
+执行命令：
+
+```bash
+./claudeinsight watch http
+```
+
+演示结果如下：
+
+![ClaudeInsight quick start watch http](/qs-watch-http.gif)
+
+**找到 5s 内最慢的几个请求**
+
+执行命令：
+
+```bash
+ ./claudeinsight stat --slow --time 5
+```
+
+演示结果如下：
+
+![ClaudeInsight stat slow](/qs-stat-slow.gif)

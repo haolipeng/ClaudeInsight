@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"kyanos/agent/protocol/dns"
+	"claudeinsight/agent/protocol/dns"
 
 	"github.com/spf13/cobra"
 )

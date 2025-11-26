@@ -4,7 +4,7 @@ set -ex
 
 CMD="$1"
 DOCKER_REGISTRY="$2"
-FILE_PREFIX="/tmp/kyanos"
+FILE_PREFIX="/tmp/claudeinsight"
 CLIENT_LNAME="${FILE_PREFIX}_truncated_client.log"
 SERVER_LNAME="${FILE_PREFIX}_truncated_server.log"
 

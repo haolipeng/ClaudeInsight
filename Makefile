@@ -18,7 +18,7 @@ ARCH ?= $(shell uname -m | sed 's/x86_64/x86/' \
 
 CLANG_BPF_SYS_INCLUDES ?= $(shell $(CLANG) -v -E - </dev/null 2>&1 \
 	| sed -n '/<...> search starts here:/,/End of search list./{ s| \(/.*\)|-idirafter \1|p }')
-APPS = kyanos
+APPS = claudeinsight
 CFLAGS := -O2 -Wall 
 ALL_LDFLAGS := $(LDFLAGS) $(EXTRA_LDFLAGS)
 
@@ -43,7 +43,7 @@ all: $(APPS)
 
 clean:
 	$(call msg,CLEAN)
-	$(Q)rm -rf $(OUTPUT) $(APPS) kyanos kyanos.log
+	$(Q)rm -rf $(OUTPUT) $(APPS) claudeinsight claudeinsight.log
 
 $(OUTPUT) $(OUTPUT)/libbpf $(BPFTOOL_OUTPUT):
 	$(call msg,MKDIR,$@)
@@ -69,14 +69,14 @@ build-bpf: $(LIBBPF_OBJ) $(wildcard bpf/*.[ch]) | $(OUTPUT)
 	TARGET=amd64 go generate ./bpf/
 	TARGET=arm64 go generate ./bpf/
 
-kyanos: $(GO_FILES)
+claudeinsight: $(GO_FILES)
 	$(call msg,BINARY,$@)
 	export CGO_LDFLAGS="-Xlinker -rpath=. -static" && go build
 
-.PHONY: kyanos-compress
-kyanos-compress: $(GO_FILES)
+.PHONY: claudeinsight-compress
+claudeinsight-compress: $(GO_FILES)
 	$(call msg,BINARY,$@)
-	export CGO_LDFLAGS="-Xlinker -rpath=. -static" && go build && upx -9 kyanos
+	export CGO_LDFLAGS="-Xlinker -rpath=. -static" && go build && upx -9 claudeinsight
 
 
 .PHONY: btfgen
@@ -112,12 +112,12 @@ format-md:
 
 .PHONY: dlv
 dlv:
-	chmod +x kyanos && dlv --headless --listen=:2345 --api-version=2 --check-go-version=false exec ./kyanos 
+	chmod +x claudeinsight && dlv --headless --listen=:2345 --api-version=2 --check-go-version=false exec ./claudeinsight 
 
-.PHONY: kyanos-debug
-kyanos-debug: $(GO_FILES)
+.PHONY: claudeinsight-debug
+claudeinsight-debug: $(GO_FILES)
 	$(call msg,BINARY,$@)
 	export CGO_LDFLAGS="-Xlinker -rpath=. -static" && go build -gcflags "all=-N -l"
 
 .PHONY: remote-debug
-remote-debug: build-bpf kyanos-debug dlv
+remote-debug: build-bpf claudeinsight-debug dlv

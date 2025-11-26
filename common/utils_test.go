@@ -2,7 +2,7 @@ package common_test
 
 import (
 	"fmt"
-	"kyanos/common"
+	"claudeinsight/common"
 	"os"
 	"reflect"
 	"slices"

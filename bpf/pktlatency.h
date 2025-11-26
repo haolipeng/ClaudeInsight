@@ -41,17 +41,12 @@ enum traffic_protocol_t {
   kProtocolUnknown,
   kProtocolHTTP,
   kProtocolHTTP2,
-  kProtocolMySQL,
   kProtocolCQL,
   kProtocolPGSQL,
   kProtocolDNS,
-  kProtocolRedis,
   kProtocolNATS,
-  kProtocolMongo,
-  kProtocolKafka,
   kProtocolMux,
   kProtocolAMQP,
-  kProtocolRocketMQ,
   kNumProtocols
 };
 
@@ -291,13 +286,13 @@ struct conn_info_t {
   union sockaddr_t laddr;
   union sockaddr_t raddr;
 
-  // The protocol of traffic on the connection (HTTP, MySQL, etc.).
+  // The protocol of traffic on the connection (HTTP, Kafka, etc.).
   enum traffic_protocol_t protocol;
   // Classify traffic as requests, responses or mixed.
   enum endpoint_role_t role;
-  // Keep the header of the last packet suspected to be MySQL/Kafka. MySQL/Kafka server does 2
+  // Keep the header of the last packet suspected to be Kafka. Kafka server does 2
   // separate read syscalls, first to read the header, and second the body of the packet. Thus, we
-  // keep a state. (MySQL): Length(3 bytes) + seq_number(1 byte). (Kafka): Length(4 bytes)
+  // keep a state. (Kafka): Length(4 bytes)
   size_t prev_count;
   char prev_buf[4];
   bool prepend_length_header;

@@ -5,7 +5,7 @@ prev: false
 
 # Compilation Steps
 
-This document describes the local compilation method for kyanos. My environment
+This document describes the local compilation method for ClaudeInsight. My environment
 is Ubuntu 22.04, and other environments may vary.
 
 ## Tool Version Requirements
@@ -22,7 +22,7 @@ If you are using Ubuntu 22.04 or later, you can initialize the compilation
 environment with a single command.
 
 ```
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/hengyoush/kyanos/refs/heads/main/init_env.sh)"
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/hengyoush/ClaudeInsight/refs/heads/main/init_env.sh)"
 ```
 
 ### Other Linux Distributions
@@ -30,8 +30,8 @@ environment with a single command.
 clone the project (don't forget to update submodle!):
 
 ```bash
-git clone https://github.com/hengyoush/kyanos
-cd kyanos
+git clone https://github.com/hengyoush/ClaudeInsight
+cd ClaudeInsight
 git submodule update --init --recursive
 ```
 
@@ -51,7 +51,7 @@ If you are just developing and testing locally, you can execute
 make build-bpf && make
 ```
 
-the kyanos executable file will be generated in the root directory of the
+the claudeinsight executable file will be generated in the root directory of the
 project.
 
 Format code:
@@ -70,8 +70,8 @@ make format-md
 >
 > Note that this binary file does not include the BTF files from
 > [btfhub-archive](https://github.com/aquasecurity/btfhub-archive/). If you run
-> this kyanos on a lower version kernel without BTF support, it may fail to
-> start. You can build a kyanos artifact with embedded BTF files using the
+> this claudeinsight on a lower version kernel without BTF support, it may fail to
+> start. You can build a claudeinsight artifact with embedded BTF files using the
 > following commands:
 >
 > ::: code-group
@@ -90,7 +90,7 @@ make format-md
 
 > [!TIP]
 >
-> If your kernel does not have BTF enabled, you may not be able to start kyanos
+> If your kernel does not have BTF enabled, you may not be able to start ClaudeInsight
 > successfully.
 >
 > Check if BTF is enabled:
@@ -103,4 +103,4 @@ make format-md
 > please download the BTF file corresponding to your kernel version from
 > [mirrors.openanolis.cn](https://mirrors.openanolis.cn/coolbpf/btf/) or
 > [btfhub-archive](https://github.com/aquasecurity/btfhub-archive/), and use the
-> `--btf` option to specify the downloaded BTF file when starting kyanos.
+> `--btf` option to specify the downloaded BTF file when starting ClaudeInsight.

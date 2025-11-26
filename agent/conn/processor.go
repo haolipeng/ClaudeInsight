@@ -3,9 +3,9 @@ package conn
 import (
 	"context"
 	"fmt"
-	"kyanos/agent/protocol"
-	"kyanos/bpf"
-	"kyanos/common"
+	"claudeinsight/agent/protocol"
+	"claudeinsight/bpf"
+	"claudeinsight/common"
 	"sync"
 	"time"
 

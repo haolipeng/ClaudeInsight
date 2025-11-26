@@ -3,8 +3,8 @@ package compatible
 import (
 	"cmp"
 	"fmt"
-	"kyanos/bpf"
-	"kyanos/common"
+	"claudeinsight/bpf"
+	"claudeinsight/common"
 	"slices"
 	"strings"
 

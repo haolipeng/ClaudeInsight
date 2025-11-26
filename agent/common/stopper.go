@@ -1,7 +1,7 @@
 package common
 
 // import (
-// 	"kyanos/common"
+// 	"claudeinsight/common"
 // 	"time"
 // )
 

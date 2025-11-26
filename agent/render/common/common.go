@@ -1,7 +1,7 @@
 package common
 
 import (
-	"kyanos/agent/analysis/common"
+	"claudeinsight/agent/analysis/common"
 	"time"
 
 	"github.com/charmbracelet/bubbles/key"

@@ -5,12 +5,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	ac "kyanos/agent/common"
-	"kyanos/agent/compatible"
-	"kyanos/agent/metadata"
-	"kyanos/agent/uprobe"
-	"kyanos/bpf"
-	"kyanos/common"
+	ac "claudeinsight/agent/common"
+	"claudeinsight/agent/compatible"
+	"claudeinsight/agent/uprobe"
+	"claudeinsight/bpf"
+	"claudeinsight/common"
 	"net"
 	"os"
 	"path/filepath"
@@ -80,9 +79,9 @@ func LoadBPF(options *ac.AgentOptions) (*BPF, error) {
 	}
 
 	ac.CollectionOpts = collectionOptions
-	if !options.Kv.SupportCapability(compatible.SupportFilterByContainer) {
 
-		lagacyobjs := &bpf.AgentLagacyKernel310Objects{}
+	lagacyobjs := &bpf.AgentLagacyKernel310Objects{}
+	if !options.Kv.SupportCapability(compatible.SupportFilterByContainer) {
 		spec, err = bpf.LoadAgentLagacyKernel310()
 		if err != nil {
 			return nil, err
@@ -129,11 +128,6 @@ func LoadBPF(options *ac.AgentOptions) (*BPF, error) {
 	return bf, nil
 }
 
-const (
-	execEventChannelBufferSize = 10
-	exitEventChannelBufferSize = 10
-)
-
 func (bf *BPF) AttachProgs(options *ac.AgentOptions) error {
 	var links *list.List
 	var err error
@@ -147,9 +141,6 @@ func (bf *BPF) AttachProgs(options *ac.AgentOptions) error {
 	}
 
 	options.LoadPorgressChannel <- "🍆 Attached base eBPF programs."
-
-	bf.attachExecEventChannels(options)
-	bf.attachExitEventChannels(options)
 
 	if options.WatchOptions.TraceSslEvent {
 		uprobeSchedEventChannel := make(chan *bpf.AgentProcessExecEvent, 10)
@@ -170,39 +161,15 @@ func (bf *BPF) AttachProgs(options *ac.AgentOptions) error {
 	return nil
 }
 
-func (bf *BPF) attachExecEventChannels(options *ac.AgentOptions) {
-	execEventChannels := []chan *bpf.AgentProcessExecEvent{}
-	execEventChannelForMetadata := make(chan *bpf.AgentProcessExecEvent, execEventChannelBufferSize)
-	execEventChannels = append(execEventChannels, execEventChannelForMetadata)
-	metadata.StartHandleSchedExecEvent(execEventChannelForMetadata, options.Ctx)
-	if options.WatchOptions.TraceSslEvent {
-		uprobeSchedEventChannel := make(chan *bpf.AgentProcessExecEvent, execEventChannelBufferSize)
-		uprobe.StartHandleSchedExecEvent(uprobeSchedEventChannel)
-		execEventChannels = append(execEventChannels, uprobeSchedEventChannel)
-		if options.ProcessExecEventChannel != nil {
-			execEventChannels = append(execEventChannels, options.ProcessExecEventChannel)
-		}
-		bpf.PullProcessExecEvents(options.Ctx, &execEventChannels)
-	}
-}
-
-func (bf *BPF) attachExitEventChannels(options *ac.AgentOptions) {
-	exitEventChannels := []chan *bpf.AgentProcessExitEvent{}
-	exitEventChannelForMetadata := make(chan *bpf.AgentProcessExitEvent, exitEventChannelBufferSize)
-	metadata.StartHandleSchedExitEvent(exitEventChannelForMetadata, options.Ctx)
-	exitEventChannels = append(exitEventChannels, exitEventChannelForMetadata)
-	bpf.PullProcessExitEvents(options.Ctx, exitEventChannels)
-}
-
 // writeToFile writes the []uint8 slice to a specified file in the system's temp directory.
-// If the temp directory does not exist, it creates a ".kyanos" directory in the current directory.
+// If the temp directory does not exist, it creates a ".claudeinsight" directory in the current directory.
 func writeToFile(data []uint8, filename string) (string, error) {
 	// Get the system's temp directory
 	tempDir := os.TempDir()
 
 	// Check if the temp directory exists
 	if _, err := os.Stat(tempDir); os.IsNotExist(err) {
-		// Create a ".kyanos" directory in the current directory
+		// Create a ".claudeinsight" directory in the current directory
 		tempDir = "."
 	}
 
@@ -356,21 +323,6 @@ func setAndValidateParameters(ctx context.Context, options *ac.AgentOptions) boo
 				}
 			}
 		}()
-	}
-
-	if options.FilterByContainer() && !options.Kv.SupportCapability(compatible.SupportFilterByContainer) {
-		common.AgentLog.Warnf("current kernel version 3.10 doesn't support filter by container id/name/podname etc.")
-	} else if options.FilterByContainer() {
-		cc, filterResult, err := applyContainerFilter(ctx, options)
-		if err == nil {
-			options.Cc = cc
-			writeFilterNsIdsToMap(filterResult, bpf.Objs)
-			one := int64(1)
-			controlValues.Update(bpf.AgentControlValueIndexTKEnableFilterByPid, one, ebpf.UpdateAny)
-		} else {
-			common.AgentLog.Errorf("applyContainerFilter failed: %v", err)
-			return false
-		}
 	}
 
 	remotePorts := viper.GetStringSlice(common.RemotePortsVarName)

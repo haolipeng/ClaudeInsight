@@ -8,7 +8,6 @@ var ClassfierTypeNames = map[ClassfierType]string{
 	RemoteIp:         "remote-ip",
 	Protocol:         "protocol",
 	HttpPath:         "http-path",
-	RedisCommand:     "redis-command",
 	ProtocolAdaptive: "protocol-adaptive",
 	Default:          "default",
 }
@@ -24,9 +23,6 @@ const (
 
 	// Http
 	HttpPath
-
-	// Redis
-	RedisCommand
 
 	ProtocolAdaptive
 )

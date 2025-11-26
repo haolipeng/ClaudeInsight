@@ -3,7 +3,7 @@ package buffer_test
 import (
 	"cmp"
 	"fmt"
-	"kyanos/agent/buffer"
+	"claudeinsight/agent/buffer"
 	"math/rand"
 	"testing"
 

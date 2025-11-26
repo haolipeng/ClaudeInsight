@@ -5,9 +5,9 @@ next:
 prev: false
 ---
 
-# 5 分钟学会使用 kyanos
+# 5 分钟学会使用 ClaudeInsight
 
-kyanos 共有三个子命令：watch、stat、overview。每个命令的作用如下：
+claudeinsight 共有三个子命令：watch、stat、overview。每个命令的作用如下：
 
 1. watch：根据你指定的条件抓取网络流量并自动解析为请求响应记录。
 2. stat：根据你指定的条件抓取请求响应记录并且聚合这些记录，得到更高维度的统计信息。
@@ -15,18 +15,18 @@ kyanos 共有三个子命令：watch、stat、overview。每个命令的作用�
 
 ## `watch` 流量采集简单用法
 
-最简单的用法如下，抓取所有 kyanos 当前能够识别的协议
+最简单的用法如下，抓取所有 claudeinsight 当前能够识别的协议
 
 ```bash
-./kyanos watch
+./claudeinsight watch
 ```
 
 每个请求响应记录会记录在表格中的一行，每列记录这个请求的基本信息。你可以通过方向键或者 j/k 上下移动来选择记录：
-![kyanos watch result](/watch-result.jpg)
+![ClaudeInsight watch result](/watch-result.jpg)
 
 按下 `enter` 进入详情界面：
 
-![kyanos watch result detail](/watch-result-detail.jpg)
+![ClaudeInsight watch result detail](/watch-result-detail.jpg)
 
 详情界面里第一部分是
 **耗时详情**，每一个方块代表数据包经过的节点，比如这里有进程、网卡、Socket 缓冲区等。  
@@ -41,20 +41,20 @@ kyanos 共有三个子命令：watch、stat、overview。每个命令的作用�
 抓取流量时一般会更有针对性，比如抓取 HTTP 流量：
 
 ```bash
-./kyanos watch http
+./claudeinsight watch http
 ```
 
 更进一步，你可能只想抓取某个 HTTP Path 的流量：
 
 ```bash
-./kyanos watch http --path /abc
+./claudeinsight watch http --path /abc
 ```
 
 每种协议都具有不同的过滤条件，而且 watch 还可以根据很多其他条件过滤，详情参考：[如何抓取请求响应和耗时细节](./watch)
 
 ## `stat` 聚合分析简单用法
 
-在真实场景中，watch 输出的结果过于细粒度，因此 kyanos 提供了 stat 命令用于
+在真实场景中，watch 输出的结果过于细粒度，因此 claudeinsight 提供了 stat 命令用于
 **统计分析**。
 
 简单来说 stat 可以用来回答这些问题：哪些连接的请求数最多？哪些远程服务端上的平均耗时最高？哪些客户端发送的请求带宽占比最高？
@@ -64,11 +64,11 @@ kyanos 共有三个子命令：watch、stat、overview。每个命令的作用�
 =/abc 的 HTTP 请求 ：
 
 ```bash
-./kyanos stat http --slow --path /abc
+./claudeinsight stat http --slow --path /abc
 ```
 
-kyanos 默认会收集 10s（可以通过 `--time` 参数指定收集时间，当然，你也可以按下
-`ctrl+c` 提前结束收集）： ![kyanos stat slow result](/qs-stat-slow.jpg)  
+claudeinsight 默认会收集 10s（可以通过 `--time` 参数指定收集时间，当然，你也可以按下
+`ctrl+c` 提前结束收集）： ![ClaudeInsight stat slow result](/qs-stat-slow.jpg)  
 10s 结束后收集结果展示在表格里：
 
 ```js{6-8}

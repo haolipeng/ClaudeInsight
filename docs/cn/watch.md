@@ -1,6 +1,6 @@
 ---
 prev:
-  text: "5分钟学会使用kyanos"
+  text: "5分钟学会使用ClaudeInsight"
   link: "./how-to"
 next:
   text: "Stat 使用方法"
@@ -17,13 +17,13 @@ next:
 从一个最简单的例子开始：
 
 ```bash
-kyanos watch
+claudeinsight watch
 ```
 
-由于没有指定任何过滤条件，因此 kyanos 会尝试采集所有它能够解析的流量，当前 kyanos 支持三种应用层协议的解析：HTTP、Redis 和 MySQL。
+由于没有指定任何过滤条件，因此 claudeinsight 会尝试采集所有它能够解析的流量，当前 claudeinsight 支持多种应用层协议的解析：HTTP 和 DNS。
 
 当你执行这行命令之后，你会看到一个表格：
-![kyanos watch result](/watch-result.jpg)
+![ClaudeInsight watch result](/watch-result.jpg)
 
 > [!TIP]
 >
@@ -45,7 +45,7 @@ kyanos watch
 按下数字键可以排序对应的列。按 `"↑"` `"↓"` 或者 `"k"` `"j"`
 可以上下移动选择表格中的记录。按下 enter 进入这次请求响应的详细界面：
 
-![kyanos watch result detail](/watch-result-detail.jpg)
+![ClaudeInsight watch result detail](/watch-result-detail.jpg)
 
 详情界面里第一部分是
 **耗时详情**，每一个方块代表数据包经过的节点，比如这里有进程、网卡、Socket 缓冲区等。  
@@ -54,7 +54,7 @@ kyanos watch
 > [!TIP]
 >
 > 如果想查看数据 **从网卡复制到TCP缓冲区** 以及 **从缓冲区读取到进程** 这两部分的耗时，可以在watch选项里加上`--trace-socket-event`:
-> ![kyanos watch result detail with socket event](/watch-result-detail-with-socket-event.jpg)
+> ![ClaudeInsight watch result detail with socket event](/watch-result-detail-with-socket-event.jpg)
 > 可以看到耗时可视化图里增加了一个 Socket 的方块。
 
 第二部分是
@@ -68,11 +68,11 @@ kyanos watch
 
 ## 如何发现你感兴趣的请求响应 {#how-to-filter}
 
-默认 kyanos 会抓取所有它目前支持协议的请求响应，在很多场景下，我们需要更加精确的过滤，比如想要发送给某个远程端口的请求，抑或是某个进程或者容器的关联的请求，又或者是某个 Redis 命令或者 HTTP 路径相关的请求。下面介绍如何使用 kyanos 的各种选项找到我们感兴趣的请求响应。
+默认 claudeinsight 会抓取所有它目前支持协议的请求响应，在很多场景下，我们需要更加精确的过滤，比如想要发送给某个远程端口的请求，抑或是某个进程关联的请求，又或者是某个 HTTP 路径相关的请求。下面介绍如何使用 claudeinsight 的各种选项找到我们感兴趣的请求响应。
 
 ### 根据 IP 端口过滤
 
-kyanos 支持根据 IP 端口等三/四层信息过滤，可以指定以下选项：
+claudeinsight 支持根据 IP 端口等三/四层信息过滤，可以指定以下选项：
 
 | 过滤条件       | 命令行 flag    | 示例                                                                                            |
 | :------------- | :------------- | :---------------------------------------------------------------------------------------------- |
@@ -81,18 +81,12 @@ kyanos 支持根据 IP 端口等三/四层信息过滤，可以指定以下选�
 | 连接的远程 ip  | `remote-ips`   | `--remote-ips  10.0.4.5,10.0.4.2` <br> 只观察远程 ip 为 10.0.4.5 和 10.0.4.2 的连接上的请求响应 |
 | 客户端/服务端  | `side`         | `--side  client/server` <br> 只观察作为客户端发起连接/作为服务端接收连接时的请求响应            |
 
-### 根据进程/容器过滤 {#filter-by-container}
+### 根据进程过滤 {#filter-by-process}
 
 | 过滤条件      | 命令行 flag      | 示例                                                                  |
 | :------------ | :--------------- | :-------------------------------------------------------------------- |
 | 进程 pid 列表 | `pids`           | `--pids 12345,12346` 多个 pid 按逗号分隔                              |
 | 进程名称      | `comm`           | `--comm 'redis-cli'`                                                  |
-| 容器 id       | `container-id`   | `--container-id xx`                                                   |
-| 容器名称      | `container-name` | `--container-name foobar`                                             |
-| k8s pod 名称  | `pod-name`       | `--pod-name nginx-7bds23212-23s1s.default` <br> 格式： NAME.NAMESPACE |
-
-值得一提的是，kyanos 也会显示容器网卡和宿主机网卡之间的耗时：
-![kyanos time detail](/timedetail.jpg)
 
 ### 根据请求响应的一般信息过滤
 
@@ -107,10 +101,9 @@ kyanos 支持根据 IP 端口等三/四层信息过滤，可以指定以下选�
 你可选择只采集某种协议的请求响应，通过在 watch 后面加上具体的协议名称，当前支持：
 
 - `http`
-- `redis`
-- `mysql`
+- `dns`
 
-比如：`kyanos watch http --path /foo/bar`, 下面是每种协议你可以使用的选项。
+比如：`claudeinsight watch http --path /foo/bar`, 下面是每种协议你可以使用的选项。
 
 #### HTTP 协议过滤
 
@@ -122,56 +115,17 @@ kyanos 支持根据 IP 端口等三/四层信息过滤，可以指定以下选�
 | 请求 Host      | `host`        | `--host www.baidu.com ` 只观察 Host 为 www.baidu.com 的请求               |
 | 请求方法       | `method`      | `--method GET` 只观察方法为 GET                                           |
 
-#### Redis 协议过滤
-
-| 过滤条件      | 命令行 flag  | 示例                                                  |
-| :------------ | :----------- | :---------------------------------------------------- |
-| 请求命令      | `command`    | `--command GET,SET ` 只观察请求命令为 GET 和 SET      |
-| 请求 Key      | `keys`       | `--keys foo,bar ` 只观察请求 key 为 foo 和 bar        |
-| 请求 key 前缀 | `key-prefix` | `--method foo:bar ` 只观察请求的 key 前缀为 foo\: bar |
-
-#### RocketMQ 协议过滤 <Badge type="tip" text="preview" />
-
-| 过滤条件 | 命令行 flag     | 示例                                                                    |
-| :------- | :-------------- | :---------------------------------------------------------------------- |
-| 请求代码 | `request-codes` | `--request-codes 10,11` 只观察请求代码为 10 和 11 的                    |
-| 语言     | `languages`     | `--languages Java,Go ` 只观察使用 Java 和 Go 编写的应用程序发出的请求。 |
-
-> 有关请求代码的含义和值，请参阅
-> [这里](https://github.com/apache/rocketmq/blob/develop/remoting/src/main/java/org/apache/rocketmq/remoting/protocol/RequestCode.java)。
-
-> 更多支持的语言，请参阅
-> [这里](https://github.com/apache/rocketmq/blob/develop/remoting/src/main/java/org/apache/rocketmq/remoting/protocol/LanguageCode.java)。
-
-
-#### Kafka 协议过滤 <Badge type="tip" text="preview" />
-
-| 过滤条件 | 命令行 flag     | 示例                                                                    |
-| :------- | :-------------- | :---------------------------------------------------------------------- |
-| 主题名称 | `topic` | `--topic quickstart-events`                  |
-| 生产者 | `producer` | `--producer` 观察 producer 的请求，指定topic时有用，默认为true                  |
-| 消费者 | `consumer` | `--consumer` 观察 consumer 的请求，指定topic时有用，默认为true                    |
-| API Key  | `apikeys` | `--apikeys 10,11` 只观察Kafka APIKEY为 10 和 11 的                    |
-
-> 有关API Key的含义和值，请参阅
-> [这里](https://kafka.apache.org/protocol#protocol_api_keys)。
-
-
 #### DNS 协议过滤 <Badge type="tip" text="preview" />
 
 | 过滤条件 | 命令行 flag     | 示例                                                                    |
 | :------- | :-------------- | :---------------------------------------------------------------------- |
 | host名称 | `host` | `--host example.com`                  |
 
-#### MYSQL 协议过滤
-
-> 已支持 MySQL 协议抓取，根据条件过滤仍在实现中...
-
 ---
 
 > [!TIP]
 >
-> 所有上述选项均可以组合使用，比如：`./kyanos watch redis --keys foo,bar --remote-ports 6379 --pid 12345`
+> 所有上述选项均可以组合使用，比如：`./claudeinsight watch http --path /api --remote-ports 80 --pid 12345`
 
 
 ## JSON 输出 <Badge type="tip" text="preview" />
@@ -181,10 +135,10 @@ kyanos 支持根据 IP 端口等三/四层信息过滤，可以指定以下选�
 
 ```bash
 # 输出到终端
-kyanos watch --json-output=stdout
+claudeinsight watch --json-output=stdout
 
 # 输出到文件
-kyanos watch --json-output=/path/to/custom.json
+claudeinsight watch --json-output=/path/to/custom.json
 ```
 
 JSON 输出中包含每个请求-响应对的详细信息，包括：

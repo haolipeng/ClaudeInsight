@@ -3,17 +3,14 @@ package common
 import (
 	"container/list"
 	"context"
-	"fmt"
-	anc "kyanos/agent/analysis/common"
-	"kyanos/agent/compatible"
-	"kyanos/agent/metadata"
-	"kyanos/agent/protocol"
-	"kyanos/agent/render/watch"
-	"kyanos/bpf"
-	"kyanos/common"
+	anc "claudeinsight/agent/analysis/common"
+	"claudeinsight/agent/compatible"
+	"claudeinsight/agent/protocol"
+	"claudeinsight/agent/render/watch"
+	"claudeinsight/bpf"
+	"claudeinsight/common"
 	"os"
 	"runtime"
-	"strings"
 )
 
 type LoadBpfProgramFunction func() *list.List
@@ -53,15 +50,7 @@ type AgentOptions struct {
 
 	FilterComm              string
 	ProcessExecEventChannel chan *bpf.AgentProcessExecEvent
-	DockerEndpoint          string
-	ContainerdEndpoint      string
-	CriRuntimeEndpoint      string
-	ContainerId             string
-	ContainerName           string
-	PodName                 string
-	PodNameSpace            string
 
-	Cc                  *metadata.ContainerCache
 	Objs                any
 	Ctx                 context.Context
 	Kv                  *compatible.KernelVersion
@@ -72,32 +61,6 @@ type AgentOptions struct {
 	ConnPerfEventMapPageNum    int
 	KernPerfEventMapPageNum    int
 	FirstPacketEventMapPageNum int
-}
-
-func (o AgentOptions) FilterByContainer() bool {
-	return o.ContainerId != "" || o.ContainerName != "" || o.PodName != ""
-}
-
-func (o AgentOptions) FilterByK8s() bool {
-	return o.PodName != ""
-}
-
-func getPodNameFilter(raw string) (name, ns string) {
-	if !strings.Contains(raw, ".") {
-		return raw, "default"
-	}
-	index := strings.LastIndex(raw, ".")
-	return raw[:index], raw[index+1:]
-}
-
-func getEndpoint(raw string) string {
-	if strings.HasPrefix(raw, "http") {
-		return raw
-	}
-	if strings.HasPrefix(raw, "unix://") {
-		return raw
-	}
-	return fmt.Sprintf("unix://%s", raw)
 }
 
 func ValidateAndRepairOptions(options AgentOptions) AgentOptions {
@@ -116,15 +79,6 @@ func ValidateAndRepairOptions(options AgentOptions) AgentOptions {
 	}
 	if newOptions.PerfEventBufferSizeForEvent <= 0 {
 		newOptions.PerfEventBufferSizeForEvent = perfEventControlBufferSize
-	}
-	if newOptions.PodName != "" {
-		newOptions.PodName, newOptions.PodNameSpace = getPodNameFilter(newOptions.PodName)
-	}
-	if newOptions.DockerEndpoint != "" {
-		newOptions.DockerEndpoint = getEndpoint(newOptions.DockerEndpoint)
-	}
-	if newOptions.CriRuntimeEndpoint != "" {
-		newOptions.CriRuntimeEndpoint = getEndpoint(newOptions.CriRuntimeEndpoint)
 	}
 	newOptions.WatchOptions.Init()
 	newOptions.LoadPorgressChannel = make(chan string, 10)

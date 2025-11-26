@@ -4,15 +4,13 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"kyanos/agent/buffer"
-	"kyanos/bpf"
-	"kyanos/common"
+	"claudeinsight/agent/buffer"
+	"claudeinsight/bpf"
+	"claudeinsight/common"
 	"net/http"
 	"regexp"
 	"slices"
 	"strings"
-
-	"k8s.io/utils/ptr"
 )
 
 var _ ProtocolStreamParser = &HTTPStreamParser{}
@@ -300,11 +298,12 @@ func (filter HttpFilter) FilterByRequest() bool {
 	if filter.needFilter != nil {
 		return *filter.needFilter
 	}
-	filter.needFilter = ptr.To(len(filter.TargetPath) > 0 ||
+	result := len(filter.TargetPath) > 0 ||
 		filter.TargetPathReg != nil ||
 		len(filter.TargetPathPrefix) > 0 ||
 		len(filter.TargetMethods) > 0 ||
-		len(filter.TargetHostName) > 0)
+		len(filter.TargetHostName) > 0
+	filter.needFilter = &result
 	return *filter.needFilter
 }
 

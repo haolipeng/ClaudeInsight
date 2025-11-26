@@ -33,6 +33,6 @@ go.work
 deps/**
 
 eapm-ebpf
-kyanos
+claudeinsight
 
 dist/

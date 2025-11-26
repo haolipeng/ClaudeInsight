@@ -1,8 +1,8 @@
 package conn
 
 import (
-	"kyanos/bpf"
-	"kyanos/common"
+	"claudeinsight/bpf"
+	"claudeinsight/common"
 	"time"
 )
 

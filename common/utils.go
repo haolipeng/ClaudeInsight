@@ -286,7 +286,7 @@ func GetKernelVersion() *version.Version {
 		release = release[:strings.Index(release, "-")]
 		v, err = version.NewVersion(release)
 		if err != nil {
-			DefaultLog.Fatalf("Can't parse kernel version: %v, may be a bug, please submit a issue on http://github.com/hengyoush/kyanos", err)
+			DefaultLog.Fatalf("Can't parse kernel version: %v, may be a bug, please submit a issue on http://github.com/hengyoush/ClaudeInsight", err)
 		} else {
 			return v
 		}

@@ -4,10 +4,10 @@ import "github.com/spf13/cobra"
 
 var overviewCmd = &cobra.Command{
 	Use:   "overview [--metrics <metric_name>]",
-	Short: "Overview the dependencies like mysql/redis/.. in one cmd line.",
+	Short: "Overview the network dependencies in one cmd line.",
 	Example: `
 # Basic Usage
-sudo kyanos overview
+sudo claudeinsight overview
 `,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) { Mode = AnalysisMode },
 	Run: func(cmd *cobra.Command, args []string) {

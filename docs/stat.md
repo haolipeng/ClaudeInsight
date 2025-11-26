@@ -13,8 +13,8 @@ broader analysis, such as:
 
 - If my HTTP requests are slow or timeout, is every server slow, or just a
   specific one?
-- If someone is sending `GET` requests (which value is big) to my Redis
-  instance, causing bandwidth saturation, which client IP is responsible?
+- If my HTTP service is sending large responses causing bandwidth saturation,
+  which client IP is responsible?
 
 The `stat` command is designed to address the need to analyze a large number of
 request-response pairs to derive conclusions.
@@ -31,19 +31,19 @@ the **response time** of **remote servers(remote-ip)**.
 then you can use the following command:
 
 ```bash
-./kyanos stat --metric total-time --group-by remote-ip
+./claudeinsight stat --metric total-time --group-by remote-ip
 ```
 
 Here, the `--metric` option is set to `total-time`, indicating that we want to
 analyze the total time of the request-responses. The `--group-by` option is set
 to `remote-ip`, meaning we want to observe the response times grouped by each
-`remote-ip`. Kyanos will aggregate all request-responses with the same
+`remote-ip`. claudeinsight will aggregate all request-responses with the same
 `remote-ip` and provide the relevant metrics for total time.
 
 A shorter version of the command would be:
 
 ```bash
-./kyanos stat -m t -g remote-ip
+./claudeinsight stat -m t -g remote-ip
 ```
 
 Here, `-m` is a shorthand for `metric`, `t` for `total-time`, and `-g` for
@@ -58,7 +58,7 @@ Here, `-m` is a shorthand for `metric`, `t` for `total-time`, and `-g` for
 ## Analyzing the Results of the Stat Command
 
 After entering the above `stat` command, you will see a table like this:
-![kyanos stat result](/stat-result.jpg)
+![ClaudeInsight stat result](/stat-result.jpg)
 
 Like the `watch` table, you can sort the columns by pressing the corresponding
 number key. You can also navigate up and down using the `"↑"` `"↓"` or `"k"`
@@ -77,7 +77,7 @@ same manner.
 
 ## Currently Supported Metrics
 
-Kyanos currently supports the following metrics that can be specified with
+claudeinsight currently supports the following metrics that can be specified with
 `--metric`:
 
 | Metric           | Short Flag | Long Flag       |
@@ -91,7 +91,7 @@ Kyanos currently supports the following metrics that can be specified with
 
 ## Currently Supported Grouping Methods
 
-Kyanos supports the following grouping dimensions that can be specified with
+claudeinsight supports the following grouping dimensions that can be specified with
 `--group-by`:
 
 | Grouping Dimension  | Value           |
@@ -102,7 +102,6 @@ Kyanos supports the following grouping dimensions that can be specified with
 | Local Port          | `local-port`    |
 | L7 Protocol         | `protocol`      |
 | HTTP Path           | `http-path`     |
-| Redis Command       | `redis-command` |
 | Aggregate All       | `none`          |
 
 ## What if You Can’t Remember These Options?
@@ -117,12 +116,12 @@ offers three quick options for analysis:
 You can also use the --time option to specify the data collection period. For
 example, --time 10 will have the stat command collect traffic for 10 seconds.
 
-![kyanos stat fast](/qs-stat-slow.jpg)
+![ClaudeInsight stat fast](/qs-stat-slow.jpg)
 
 Once the collection is complete or if you press `ctrl+c` to stop early, you’ll
 see a table like this:
 
-![kyanos stat quick result](/stat-quick-result.jpg)
+![ClaudeInsight stat quick result](/stat-quick-result.jpg)
 
 From there, the operation proceeds in the same way as before.
 
@@ -131,7 +130,7 @@ From there, the operation proceeds in the same way as before.
 To quickly identify which `remote-ip` has the slowest HTTP requests, use:
 
 ```bash
-./kyanos stat http --slow
+./claudeinsight stat http --slow
 ```
 
 ### Analyzing Large Requests and Responses
@@ -139,11 +138,11 @@ To quickly identify which `remote-ip` has the slowest HTTP requests, use:
 To find which `remote-ip` has the largest requests, run:
 
 ```bash
-./kyanos stat http --bigreq
+./claudeinsight stat http --bigreq
 ```
 
 To identify which `remote-ip` has the largest responses, use:
 
 ```bash
-./kyanos stat http --bigresp
+./claudeinsight stat http --bigresp
 ```

@@ -5,12 +5,7 @@ import (
 )
 
 var ProtocolNamesMap = map[AgentTrafficProtocolT]string{
-	AgentTrafficProtocolTKProtocolHTTP:  "HTTP",
-	AgentTrafficProtocolTKProtocolRedis: "Redis",
-	AgentTrafficProtocolTKProtocolMySQL: "MySQL",
-	AgentTrafficProtocolTKProtocolMongo: "Mongo",
-	AgentTrafficProtocolTKProtocolRocketMQ: "RocketMQ",
-	AgentTrafficProtocolTKProtocolKafka:    "Kafka",
+	AgentTrafficProtocolTKProtocolHTTP: "HTTP",
 }
 
 var StepCNNames [AgentStepTEnd + 1]string = [AgentStepTEnd + 1]string{"Start", "SSLWrite", "System Call(Out)", "TCP Layer(Out)", "IP Layer(Out)", "QDISC", "DEV Layer(Out)", "NIC(Out)", "NIC(In)", "DEV Layer(In)", "IP Layer(In)", "TCP Layer(In)", "User Data Copy", "System Call(In)", "SSLRead", "End"}

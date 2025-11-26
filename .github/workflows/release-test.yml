@@ -39,21 +39,21 @@ jobs:
       - name: Test binary
         run: |
           ls dist/
-          mkdir amd64 && tar zxvf dist/kyanos_v0.0.0-next_linux_amd64.tar.gz -C amd64
-          mkdir arm64 && tar zxvf dist/kyanos_v0.0.0-next_linux_arm64.tar.gz -C arm64
-          file ./amd64/kyanos
-          file ./arm64/kyanos
-          file ./amd64/kyanos |grep x86-64 |grep 'statically linked'
-          file ./arm64/kyanos |grep aarch64 |grep 'statically linked'
+          mkdir amd64 && tar zxvf dist/claudeinsight_v0.0.0-next_linux_amd64.tar.gz -C amd64
+          mkdir arm64 && tar zxvf dist/claudeinsight_v0.0.0-next_linux_arm64.tar.gz -C arm64
+          file ./amd64/claudeinsight
+          file ./arm64/claudeinsight
+          file ./amd64/claudeinsight |grep x86-64 |grep 'statically linked'
+          file ./arm64/claudeinsight |grep aarch64 |grep 'statically linked'
 
       - name: Store Releases
         uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4
         with:
-          name: kyanos_v0.0.0-next_linux_amd64.tar.gz
-          path: dist/kyanos_v0.0.0-next_linux_amd64.tar.gz
+          name: claudeinsight_v0.0.0-next_linux_amd64.tar.gz
+          path: dist/claudeinsight_v0.0.0-next_linux_amd64.tar.gz
 
       - name: Store Releases
         uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4
         with:
-          name: kyanos_v0.0.0-next_linux_arm64.tar.gz
-          path: dist/kyanos_v0.0.0-next_linux_arm64.tar.gz
+          name: claudeinsight_v0.0.0-next_linux_arm64.tar.gz
+          path: dist/claudeinsight_v0.0.0-next_linux_arm64.tar.gz

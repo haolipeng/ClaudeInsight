@@ -4,33 +4,30 @@ set -ex
 
 CMD="$1"
 DOCKER_REGISTRY="$2"
-FILE_PREFIX="/tmp/kyanos"
+FILE_PREFIX="/tmp/claudeinsight"
 CLIENT_MATCH_LNAME="${FILE_PREFIX}_side_client_match.log"
 CLIENT_NONMATCH_LNAME="${FILE_PREFIX}_side_client_nonmatch.log"
 
 function test_side_client_match() {
-    if [ -z "$DOCKER_REGISTRY" ]; then 
-        IMAGE_NAME="mysql:5.7.19"
+    if [ -z "$DOCKER_REGISTRY" ]; then
+        IMAGE_NAME="nginx:1.23.1"
     else
-        IMAGE_NAME=$DOCKER_REGISTRY"/library/mysql:5.7.19"
+        IMAGE_NAME=$DOCKER_REGISTRY"/library/nginx:1.23.1"
     fi
     docker pull "$IMAGE_NAME"
-    mkdir -p /opt/docker_v/mysql/conf
-    pushd /opt/docker_v/mysql/conf
-    touch  my.cnf
-    printf "[mysqld]\nskip_ssl" > my.cnf
-    popd
-    pip install --break-system-packages mysql-connector-python || true
 
-    cname='test-mysql'
+    cname='test-nginx-side'
     docker rm -f $cname || true
-    cid1=$(docker run --name $cname -e MYSQL_ROOT_PASSWORD=123456 -e MYSQL_ROOT_HOST=%  -p 3306:3306 -v /opt/docker_v/mysql/conf:/etc/mysql/conf.d -d "$IMAGE_NAME")
+    cid1=$(docker run --name $cname -p 8080:80 -d "$IMAGE_NAME")
     export cid1
     echo $cid1
 
-    timeout 30 ${CMD} watch --debug-output mysql --side client 2>&1 | tee "${CLIENT_MATCH_LNAME}" &
+    timeout 30 ${CMD} watch --debug-output http --side client 2>&1 | tee "${CLIENT_MATCH_LNAME}" &
     sleep 10
-    python3 ./testdata/query_mysql.py 5
+    for i in $(seq 1 5); do
+        curl -s http://127.0.0.1:8080/ > /dev/null || true
+        sleep 0.3
+    done
     wait
 
     cat "${CLIENT_MATCH_LNAME}"
@@ -41,28 +38,25 @@ function test_side_client_match() {
 }
 
 function test_side_client_nonmatch() {
-    if [ -z "$DOCKER_REGISTRY" ]; then 
-        IMAGE_NAME="mysql:5.7.19"
+    if [ -z "$DOCKER_REGISTRY" ]; then
+        IMAGE_NAME="nginx:1.23.1"
     else
-        IMAGE_NAME=$DOCKER_REGISTRY"/library/mysql:5.7.19"
+        IMAGE_NAME=$DOCKER_REGISTRY"/library/nginx:1.23.1"
     fi
     docker pull "$IMAGE_NAME"
-    mkdir -p /opt/docker_v/mysql/conf
-    pushd /opt/docker_v/mysql/conf
-    touch  my.cnf
-    printf "[mysqld]\nskip_ssl" > my.cnf
-    popd
-    pip install --break-system-packages mysql-connector-python || true
 
-    cname='test-mysql'
+    cname='test-nginx-side'
     docker rm -f $cname || true
-    cid1=$(docker run --name $cname -e MYSQL_ROOT_PASSWORD=123456 -e MYSQL_ROOT_HOST=%   -p 3306:3306 -v /opt/docker_v/mysql/conf:/etc/mysql/conf.d -d "$IMAGE_NAME")
+    cid1=$(docker run --name $cname -p 8080:80 -d "$IMAGE_NAME")
     export cid1
     echo $cid1
 
-    timeout 30 ${CMD} watch --debug-output mysql --side server 2>&1 | tee "${CLIENT_NONMATCH_LNAME}" &
+    timeout 30 ${CMD} watch --debug-output http --side server 2>&1 | tee "${CLIENT_NONMATCH_LNAME}" &
     sleep 10
-    python3 ./testdata/query_mysql.py 20
+    for i in $(seq 1 20); do
+        curl -s http://127.0.0.1:8080/ > /dev/null || true
+        sleep 0.3
+    done
     wait
 
     cat "${CLIENT_NONMATCH_LNAME}"

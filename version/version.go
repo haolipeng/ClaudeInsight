@@ -1,9 +1,9 @@
 package version
 
 import (
+	"claudeinsight/common"
 	"context"
 	"fmt"
-	"kyanos/common"
 	"strings"
 	"time"
 
@@ -11,11 +11,11 @@ import (
 )
 
 var (
-	// String -X "kyanos/version.Version={{.Version}}"
+	// String -X "claudeinsight/version.Version={{.Version}}"
 	Version string
-	// BuildTime -X "kyanos/version.CommitID={{.Commit}}"
+	// BuildTime -X "claudeinsight/version.CommitID={{.Commit}}"
 	BuildTime string
-	// CommitID -X "kyanos/version.BuildTime={{.Date}}"
+	// CommitID -X "claudeinsight/version.BuildTime={{.Date}}"
 	CommitID string
 )
 
@@ -47,7 +47,7 @@ func ReleaseVersion(ctx context.Context) (string, string, error) {
 	defer cancel()
 
 	client := github.NewClient(nil)
-	releases, _, err := client.Repositories.GetLatestRelease(ctx, "hengyoush", "kyanos")
+	releases, _, err := client.Repositories.GetLatestRelease(ctx, "hengyoush", "ClaudeInsight")
 	if err != nil {
 		return "", "", err
 	}
@@ -55,11 +55,11 @@ func ReleaseVersion(ctx context.Context) (string, string, error) {
 	if err != nil {
 		return "", "", err
 	}
-	kyanosAsset := fmt.Sprintf("kyanos_%s_linux_%s.tar.gz", strings.TrimPrefix(*releases.TagName, "v"), arch)
+	ClaudeInsightAsset := fmt.Sprintf("ClaudeInsight_%s_linux_%s.tar.gz", strings.TrimPrefix(*releases.TagName, "v"), arch)
 	for _, asset := range releases.Assets {
-		if *asset.Name == kyanosAsset {
+		if *asset.Name == ClaudeInsightAsset {
 			return *releases.TagName, *asset.BrowserDownloadURL, nil
 		}
 	}
-	return *releases.TagName, "", fmt.Errorf("no asset found for %s in github release", kyanosAsset)
+	return *releases.TagName, "", fmt.Errorf("no asset found for %s in github release", ClaudeInsightAsset)
 }

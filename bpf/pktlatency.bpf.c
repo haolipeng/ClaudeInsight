@@ -767,20 +767,20 @@ static __always_inline void handle_nat(struct nf_conn *ct) {
 
     struct sock_key reversed_orig = {0};
     reverse_flow(&orig, &reversed_orig);
-    // bpf_printk("[kyanos] nat flow %pI4:%d %pI4 ->\n",
+    // bpf_printk("[ClaudeInsight] nat flow %pI4:%d %pI4 ->\n",
     // 		&reply.sip[0], reply.sport,
     // 	       	&reply.dip[0]);
-    // bpf_printk("[kyanos]                               -> %pI4:%d %pI4\n",
+    // bpf_printk("[ClaudeInsight]                               -> %pI4:%d %pI4\n",
     // 		&reversed_orig.sip[0], reversed_orig.sport,
     // 		&reversed_orig.dip[0]);
     bpf_map_update_elem(&nat_flow_map,  &reversed_orig,&reply, BPF_ANY);
 
     struct sock_key reversed_reply = {0};
     reverse_flow(&reply, &reversed_reply);
-    // bpf_printk("[kyanos] nat flow %pI4:%d %pI4: ->\n",
+    // bpf_printk("[ClaudeInsight] nat flow %pI4:%d %pI4: ->\n",
     // 		&reversed_reply.sip[0], reversed_reply.sport,
     // 	       	&reversed_reply.dip[0]);
-    // bpf_printk("[kyanos]                               -> %pI4:%d %pI4\n",
+    // bpf_printk("[ClaudeInsight]                               -> %pI4:%d %pI4\n",
     // 		&orig.sip[0], orig.sport,
     // 		&orig.dip[0]);
     bpf_map_update_elem(&nat_flow_map,  &orig,&reversed_reply, BPF_ANY);

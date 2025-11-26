@@ -49,7 +49,7 @@ func SetLogToFile() {
 		logdir := "/tmp"
 		if logdir != "" {
 			hook, err := rotatelog.NewHook(
-				logdir+"/kyanos.log.%Y%m%d",
+				logdir+"/claudeinsight.log.%Y%m%d",
 				rotatelog.WithMaxAge(time.Hour*24),
 				rotatelog.WithRotationTime(time.Hour),
 			)

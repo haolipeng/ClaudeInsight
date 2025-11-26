@@ -1,8 +1,8 @@
 package analysis
 
 import (
-	anc "kyanos/agent/analysis/common"
-	"kyanos/common"
+	anc "claudeinsight/agent/analysis/common"
+	"claudeinsight/common"
 )
 
 type ConnStat struct {

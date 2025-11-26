@@ -1,12 +1,12 @@
 package analysis
 
 import (
-	analysisCommon "kyanos/agent/analysis/common"
-	. "kyanos/agent/common"
-	"kyanos/agent/conn"
-	"kyanos/agent/protocol"
-	"kyanos/bpf"
-	. "kyanos/common"
+	analysisCommon "claudeinsight/agent/analysis/common"
+	. "claudeinsight/agent/common"
+	"claudeinsight/agent/conn"
+	"claudeinsight/agent/protocol"
+	"claudeinsight/bpf"
+	. "claudeinsight/common"
 	"math"
 
 	"github.com/jefurry/logrus"

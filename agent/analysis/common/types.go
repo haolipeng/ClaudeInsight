@@ -2,10 +2,10 @@ package common
 
 import (
 	"fmt"
-	"kyanos/agent/protocol"
-	"kyanos/bpf"
-	"kyanos/common"
-	ac "kyanos/common"
+	"claudeinsight/agent/protocol"
+	"claudeinsight/bpf"
+	"claudeinsight/common"
+	ac "claudeinsight/common"
 
 	"golang.org/x/exp/constraints"
 )

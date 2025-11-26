@@ -8,9 +8,9 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
-	ac "kyanos/agent/common"
-	"kyanos/bpf"
-	"kyanos/common"
+	ac "claudeinsight/agent/common"
+	"claudeinsight/bpf"
+	"claudeinsight/common"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -27,7 +27,7 @@ import (
 
 const (
 	DefaultPath   = "/sys/kernel/btf/vmlinux"
-	candidatePath = "/var/lib/kyanos/btf/vmlinux"
+	candidatePath = "/var/lib/claudeinsight/btf/vmlinux"
 
 	// https://github.com/aquasecurity/btfhub-archive/raw/main/centos/7/x86_64/4.19.113-300.el7.x86_64.btf.tar.xz
 	btfHubURL = "https://github.com/aquasecurity/btfhub-archive/raw/main/%s/%s/%s/%s.btf.tar.xz"
@@ -46,7 +46,7 @@ func generateBTF(fileBytes []byte) (*btf.Spec, error) {
 		return nil, nil
 	}
 
-	btfFilePath, err := writeToFile(fileBytes, ".kyanos.btf")
+	btfFilePath, err := writeToFile(fileBytes, ".claudeinsight.btf")
 	if err != nil {
 		common.AgentLog.Warnf("failed write embeded btf file to disk: %+v", err)
 		return nil, err
@@ -55,7 +55,7 @@ func generateBTF(fileBytes []byte) (*btf.Spec, error) {
 
 	btfPath, err := btf.LoadSpec(btfFilePath)
 	if err != nil {
-		common.AgentLog.Warnf("can't load btf spec: %v (embedded in kyanos)", err)
+		common.AgentLog.Warnf("can't load btf spec: %v (embedded in claudeinsight)", err)
 		return nil, err
 	}
 

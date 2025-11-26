@@ -6,7 +6,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
-	"kyanos/common"
+	"claudeinsight/common"
 	"os"
 	"sync/atomic"
 	"unsafe"

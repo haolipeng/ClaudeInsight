@@ -2,7 +2,7 @@ package bpf_test
 
 import (
 	"fmt"
-	"kyanos/bpf"
+	"claudeinsight/bpf"
 	"reflect"
 	"testing"
 

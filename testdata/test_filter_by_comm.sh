@@ -3,12 +3,12 @@
 set -ex
 
 CMD="$1"
-FILE_PREFIX="/tmp/kyanos"
+FILE_PREFIX="/tmp/claudeinsight"
 BEFORE_LNAME="${FILE_PREFIX}_filter_by_comm_before.log"
 AFTER_LNAME="${FILE_PREFIX}_filter_by_comm_after.log"
 
 function test_filter_by_server_comm() {
-    # server start before kyanos
+    # server start before claudeinsight
     timeout 40 python3 ./testdata/start_http_server.py  &
     timeout 30 ${CMD} watch --debug-output http --comm python3 2>&1 | tee "${BEFORE_LNAME}" &
     sleep 2
@@ -20,9 +20,9 @@ function test_filter_by_server_comm() {
     cat "${BEFORE_LNAME}" | grep "Host: 127.0.0.1:8080" | grep "\\[side\\]=server"
 }
 
-# skip for https://github.com/hengyoush/kyanos/pull/222#issuecomment-2566106756
+# skip for https://github.com/hengyoush/ClaudeInsight/pull/222#issuecomment-2566106756
 function test_filter_by_client_comm() {
-    # client start after kyanos
+    # client start after claudeinsight
     timeout 40 ${CMD} watch --debug-output http --comm curl 2>&1 | tee "${AFTER_LNAME}" &
     sleep 20
     curl 'http://ipinfo.io'  &>/dev/null || true

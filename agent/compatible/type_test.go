@@ -1,7 +1,7 @@
 package compatible_test
 
 import (
-	"kyanos/agent/compatible"
+	"claudeinsight/agent/compatible"
 	"testing"
 
 	"github.com/stretchr/testify/assert"

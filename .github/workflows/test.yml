@@ -8,7 +8,7 @@ on:
     branches: [ "main", "dev","feature/*","unstable" ]
 
 env:
-  kyanos_log_option: --bpf-event-log-level 5 --conntrack-log-level 5 --agent-log-level 5
+  claudeinsight_log_option: --bpf-event-log-level 5 --conntrack-log-level 5 --agent-log-level 5
 
 permissions:
   contents: read
@@ -51,8 +51,8 @@ jobs:
       - name: Store executable
         uses: actions/upload-artifact@v4.6.1
         with:
-          name: kyanos
-          path: kyanos
+          name: claudeinsight
+          path: claudeinsight
 
 
   e2e-test:
@@ -85,23 +85,23 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Retrieve stored kyanos executable
+      - name: Retrieve stored claudeinsight executable
         uses: actions/download-artifact@v4.1.9
         with:
-          name: kyanos
-          path: kyanos
+          name: claudeinsight
+          path: claudeinsight
 
       - name: Provision LVH VMs
         uses: cilium/little-vm-helper@c44c1221b104ee02ec0235211f7ace3c88eb11a2 # v0.0.19
         with:
-          test-name: kyanos-test
+          test-name: claudeinsight-test
           image-version: ${{ matrix.kernel }}
           cpu: 2
           mem: '4G'
           host-mount: ./
           install-dependencies: 'true'
           cmd: |
-            chmod +x /host/kyanos/kyanos
+            chmod +x /host/claudeinsight/claudeinsight
 
       - name: download btf file
         if: ${{ startsWith(matrix.kernel, '4.') }}
@@ -125,9 +125,9 @@ jobs:
             cat /etc/issue
             cat /etc/os-release
 
-            sudo mkdir -p /var/lib/kyanos/btf/
+            sudo mkdir -p /var/lib/claudeinsight/btf/
 
-            sudo cp /host/data/kernels/4.*/boot/btf-4.* /var/lib/kyanos/btf/current.btf
+            sudo cp /host/data/kernels/4.*/boot/btf-4.* /var/lib/claudeinsight/btf/current.btf
             # btf_file=$(find /host/ -path "*btf*" -type f)
             # sudo cp $btf_file /var/lib/ptcpdump/btf/vmlinux
 
@@ -140,19 +140,10 @@ jobs:
             apt-get install -y dnsutils || true
             apt-get install -y bind9-dnsutils || true
             # install btf
-            if [ -f "/sys/kernel/btf/vmlinux" ]; then  
-              mkdir -p /var/lib/kyanos/btf
-              cp -f /sys/kernel/btf/vmlinux /var/lib/kyanos/btf/current.btf
+            if [ -f "/sys/kernel/btf/vmlinux" ]; then
+              mkdir -p /var/lib/claudeinsight/btf
+              cp -f /sys/kernel/btf/vmlinux /var/lib/claudeinsight/btf/current.btf
             fi
-            # install nerdctl
-            wget https://github.com/containerd/nerdctl/releases/download/v1.7.6/nerdctl-1.7.6-linux-amd64.tar.gz
-            sudo tar Cxzvvf /usr/local/bin nerdctl-1.7.6-linux-amd64.tar.gz
-            wget https://github.com/containernetworking/plugins/releases/download/v1.5.0/cni-plugins-linux-amd64-v1.5.0.tgz
-            sudo mkdir -p /opt/cni/bin
-            sudo tar Cxzvvf /opt/cni/bin cni-plugins-linux-amd64-v1.5.0.tgz
-
-            #install redis-cli
-            sudo apt install -y redis-tools
 
             #install python pip
             sudo apt install -y python3 python3-pip pipx
@@ -163,11 +154,6 @@ jobs:
             sudo chmod +x /usr/local/bin/docker-compose
             docker-compose --version
 
-            #install mongodb shell
-            wget -qO- https://www.mongodb.org/static/pgp/server-8.0.asc | sudo tee /etc/apt/trusted.gpg.d/server-8.0.asc
-            echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/8.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-8.0.list
-            sudo apt-get update
-            sudo apt-get install -y mongodb-mongosh
 
       - name: Test DNS
         uses: cilium/little-vm-helper@c44c1221b104ee02ec0235211f7ace3c88eb11a2 # v0.0.19
@@ -178,25 +164,10 @@ jobs:
             uname -a
             cat /etc/issue
             pushd /host
-            if [ -f "/var/lib/kyanos/btf/current.btf" ]; then  
-                bash /host/testdata/test_dns.sh 'sudo /host/kyanos/kyanos $kyanos_log_option --btf /var/lib/kyanos/btf/current.btf'
+            if [ -f "/var/lib/claudeinsight/btf/current.btf" ]; then  
+                bash /host/testdata/test_dns.sh 'sudo /host/claudeinsight/claudeinsight $claudeinsight_log_option --btf /var/lib/claudeinsight/btf/current.btf'
             else  
-                bash /host/testdata/test_dns.sh 'sudo /host/kyanos/kyanos $kyanos_log_option'
-            fi
-            popd
-      - name: Test Mongo
-        uses: cilium/little-vm-helper@c44c1221b104ee02ec0235211f7ace3c88eb11a2 # v0.0.19
-        with:
-          provision: 'false'
-          cmd: |
-            set -euxo pipefail
-            uname -a
-            cat /etc/issue
-            pushd /host
-            if [ -f "/var/lib/kyanos/btf/current.btf" ]; then  
-                bash /host/testdata/test_mongodb.sh 'sudo /host/kyanos/kyanos $kyanos_log_option --btf /var/lib/kyanos/btf/current.btf'
-            else  
-                bash /host/testdata/test_mongodb.sh 'sudo /host/kyanos/kyanos $kyanos_log_option'
+                bash /host/testdata/test_dns.sh 'sudo /host/claudeinsight/claudeinsight $claudeinsight_log_option'
             fi
             popd
 
@@ -209,26 +180,10 @@ jobs:
             uname -a
             cat /etc/issue
             pushd /host
-            if [ -f "/var/lib/kyanos/btf/current.btf" ]; then  
-                bash /host/testdata/test_truncated_data.sh 'sudo /host/kyanos/kyanos $kyanos_log_option --btf /var/lib/kyanos/btf/current.btf'
+            if [ -f "/var/lib/claudeinsight/btf/current.btf" ]; then  
+                bash /host/testdata/test_truncated_data.sh 'sudo /host/claudeinsight/claudeinsight $claudeinsight_log_option --btf /var/lib/claudeinsight/btf/current.btf'
             else  
-                bash /host/testdata/test_truncated_data.sh 'sudo /host/kyanos/kyanos $kyanos_log_option'
-            fi
-            popd
-
-      - name: Test Kafka
-        uses: cilium/little-vm-helper@c44c1221b104ee02ec0235211f7ace3c88eb11a2 # v0.0.19
-        with:
-          provision: 'false'
-          cmd: |
-            set -euxo pipefail
-            uname -a
-            cat /etc/issue
-            pushd /host
-            if [ -f "/var/lib/kyanos/btf/current.btf" ]; then  
-                bash /host/testdata/test_kafka.sh 'sudo /host/kyanos/kyanos $kyanos_log_option --btf /var/lib/kyanos/btf/current.btf'
-            else  
-                bash /host/testdata/test_kafka.sh 'sudo /host/kyanos/kyanos $kyanos_log_option'
+                bash /host/testdata/test_truncated_data.sh 'sudo /host/claudeinsight/claudeinsight $claudeinsight_log_option'
             fi
             popd
 
@@ -257,22 +212,6 @@ jobs:
             pushd /host
             bash /host/testdata/run_cap_bpf_test.sh "" "CAP_SYS_ADMIN"
             popd
-      
-      - name: Test RocketMQ
-        uses: cilium/little-vm-helper@c44c1221b104ee02ec0235211f7ace3c88eb11a2 # v0.0.19
-        with:
-          provision: 'false'
-          cmd: |
-            set -ex
-            uname -a
-            cat /etc/issue
-            pushd /host
-            if [ -f "/var/lib/kyanos/btf/current.btf" ]; then  
-                bash /host/testdata/test_rocketmq.sh 'sudo /host/kyanos/kyanos $kyanos_log_option --btf /var/lib/kyanos/btf/current.btf'
-            else  
-                bash /host/testdata/test_rocketmq.sh 'sudo /host/kyanos/kyanos $kyanos_log_option'
-            fi
-            popd
 
       - name: Test filter by comm
         uses: cilium/little-vm-helper@c44c1221b104ee02ec0235211f7ace3c88eb11a2 # v0.0.19
@@ -283,10 +222,10 @@ jobs:
             uname -a
             cat /etc/issue
             pushd /host
-            if [ -f "/var/lib/kyanos/btf/current.btf" ]; then
-                bash /host/testdata/test_filter_by_comm.sh 'sudo /host/kyanos/kyanos $kyanos_log_option --btf /var/lib/kyanos/btf/current.btf'
+            if [ -f "/var/lib/claudeinsight/btf/current.btf" ]; then
+                bash /host/testdata/test_filter_by_comm.sh 'sudo /host/claudeinsight/claudeinsight $claudeinsight_log_option --btf /var/lib/claudeinsight/btf/current.btf'
             else
-                bash /host/testdata/test_filter_by_comm.sh 'sudo /host/kyanos/kyanos $kyanos_log_option'
+                bash /host/testdata/test_filter_by_comm.sh 'sudo /host/claudeinsight/claudeinsight $claudeinsight_log_option'
             fi
             popd
 
@@ -299,10 +238,10 @@ jobs:
             uname -a
             cat /etc/issue
             pushd /host
-            if [ -f "/var/lib/kyanos/btf/current.btf" ]; then  
-                bash /host/testdata/test_gotls.sh 'sudo /host/kyanos/kyanos $kyanos_log_option --btf /var/lib/kyanos/btf/current.btf'
+            if [ -f "/var/lib/claudeinsight/btf/current.btf" ]; then  
+                bash /host/testdata/test_gotls.sh 'sudo /host/claudeinsight/claudeinsight $claudeinsight_log_option --btf /var/lib/claudeinsight/btf/current.btf'
             else  
-                bash /host/testdata/test_gotls.sh 'sudo /host/kyanos/kyanos $kyanos_log_option'
+                bash /host/testdata/test_gotls.sh 'sudo /host/claudeinsight/claudeinsight $claudeinsight_log_option'
             fi
             popd
 
@@ -315,10 +254,10 @@ jobs:
             uname -a
             cat /etc/issue
             pushd /host
-            if [ -f "/var/lib/kyanos/btf/current.btf" ]; then  
-                bash /host/testdata/test_https.sh 'sudo /host/kyanos/kyanos $kyanos_log_option --btf /var/lib/kyanos/btf/current.btf'
+            if [ -f "/var/lib/claudeinsight/btf/current.btf" ]; then  
+                bash /host/testdata/test_https.sh 'sudo /host/claudeinsight/claudeinsight $claudeinsight_log_option --btf /var/lib/claudeinsight/btf/current.btf'
             else  
-                bash /host/testdata/test_https.sh 'sudo /host/kyanos/kyanos $kyanos_log_option'
+                bash /host/testdata/test_https.sh 'sudo /host/claudeinsight/claudeinsight $claudeinsight_log_option'
             fi
             popd
 
@@ -331,26 +270,10 @@ jobs:
             uname -a
             cat /etc/issue
             pushd /host
-            if [ -f "/var/lib/kyanos/btf/current.btf" ]; then  
-                bash /host/testdata/test_side.sh 'sudo /host/kyanos/kyanos $kyanos_log_option --btf /var/lib/kyanos/btf/current.btf'
+            if [ -f "/var/lib/claudeinsight/btf/current.btf" ]; then  
+                bash /host/testdata/test_side.sh 'sudo /host/claudeinsight/claudeinsight $claudeinsight_log_option --btf /var/lib/claudeinsight/btf/current.btf'
             else  
-                bash /host/testdata/test_side.sh 'sudo /host/kyanos/kyanos $kyanos_log_option'
-            fi
-            popd
-
-      - name: Test mysql
-        uses: cilium/little-vm-helper@c44c1221b104ee02ec0235211f7ace3c88eb11a2 # v0.0.19
-        with:
-          provision: 'false'
-          cmd: |
-            set -ex
-            uname -a
-            cat /etc/issue
-            pushd /host
-            if [ -f "/var/lib/kyanos/btf/current.btf" ]; then  
-                bash /host/testdata/test_mysql.sh 'sudo /host/kyanos/kyanos $kyanos_log_option --btf /var/lib/kyanos/btf/current.btf'
-            else  
-                bash /host/testdata/test_mysql.sh 'sudo /host/kyanos/kyanos $kyanos_log_option'
+                bash /host/testdata/test_side.sh 'sudo /host/claudeinsight/claudeinsight $claudeinsight_log_option'
             fi
             popd
 
@@ -362,10 +285,10 @@ jobs:
             set -ex
             uname -a
             cat /etc/issue
-            if [ -f "/var/lib/kyanos/btf/current.btf" ]; then  
-                bash /host/testdata/test_base.sh 'sudo /host/kyanos/kyanos $kyanos_log_option --btf /var/lib/kyanos/btf/current.btf'
+            if [ -f "/var/lib/claudeinsight/btf/current.btf" ]; then  
+                bash /host/testdata/test_base.sh 'sudo /host/claudeinsight/claudeinsight $claudeinsight_log_option --btf /var/lib/claudeinsight/btf/current.btf'
             else  
-                bash /host/testdata/test_base.sh 'sudo /host/kyanos/kyanos $kyanos_log_option'
+                bash /host/testdata/test_base.sh 'sudo /host/claudeinsight/claudeinsight $claudeinsight_log_option'
             fi
 
       - name: Test filter by l3/l4 info
@@ -376,10 +299,10 @@ jobs:
             set -ex
             uname -a
             cat /etc/issue
-            if [ -f "/var/lib/kyanos/btf/current.btf" ]; then  
-                bash /host/testdata/test_filter_by_l4.sh 'sudo /host/kyanos/kyanos $kyanos_log_option --btf /var/lib/kyanos/btf/current.btf'
+            if [ -f "/var/lib/claudeinsight/btf/current.btf" ]; then  
+                bash /host/testdata/test_filter_by_l4.sh 'sudo /host/claudeinsight/claudeinsight $claudeinsight_log_option --btf /var/lib/claudeinsight/btf/current.btf'
             else  
-                bash /host/testdata/test_filter_by_l4.sh 'sudo /host/kyanos/kyanos $kyanos_log_option'
+                bash /host/testdata/test_filter_by_l4.sh 'sudo /host/claudeinsight/claudeinsight $claudeinsight_log_option'
             fi
 
       - name: Test kern evt
@@ -390,105 +313,8 @@ jobs:
             set -ex
             uname -a
             cat /etc/issue
-            if [ -f "/var/lib/kyanos/btf/current.btf" ]; then  
-                bash /host/testdata/test_kern_evt.sh 'sudo /host/kyanos/kyanos $kyanos_log_option --btf /var/lib/kyanos/btf/current.btf'
-            else  
-                bash /host/testdata/test_kern_evt.sh 'sudo /host/kyanos/kyanos $kyanos_log_option'
+            if [ -f "/var/lib/claudeinsight/btf/current.btf" ]; then
+                bash /host/testdata/test_kern_evt.sh 'sudo /host/claudeinsight/claudeinsight $claudeinsight_log_option --btf /var/lib/claudeinsight/btf/current.btf'
+            else
+                bash /host/testdata/test_kern_evt.sh 'sudo /host/claudeinsight/claudeinsight $claudeinsight_log_option'
             fi
-
-      - name: Test test docker filter by container id
-        uses: cilium/little-vm-helper@c44c1221b104ee02ec0235211f7ace3c88eb11a2 # v0.0.19
-        with:
-          provision: 'false'
-          cmd: |
-            set -ex
-            uname -a
-            cat /etc/issue
-            if [ -f "/var/lib/kyanos/btf/current.btf" ]; then  
-                bash /host/testdata/test_docker_filter_by_container_id.sh 'sudo /host/kyanos/kyanos $kyanos_log_option --btf /var/lib/kyanos/btf/current.btf'
-            else  
-                bash /host/testdata/test_docker_filter_by_container_id.sh 'sudo /host/kyanos/kyanos $kyanos_log_option'
-            fi
-
-      - name: Test test docker filter by container name
-        uses: cilium/little-vm-helper@c44c1221b104ee02ec0235211f7ace3c88eb11a2 # v0.0.19
-        with:
-          provision: 'false'
-          cmd: |
-            set -ex
-            uname -a
-            cat /etc/issue
-            if [ -f "/var/lib/kyanos/btf/current.btf" ]; then  
-                bash /host/testdata/test_docker_filter_by_container_name.sh 'sudo /host/kyanos/kyanos $kyanos_log_option --btf /var/lib/kyanos/btf/current.btf'
-            else  
-                bash /host/testdata/test_docker_filter_by_container_name.sh 'sudo /host/kyanos/kyanos $kyanos_log_option'
-            fi
-
-      - name: Test filter by pid
-        uses: cilium/little-vm-helper@c44c1221b104ee02ec0235211f7ace3c88eb11a2 # v0.0.19
-        with:
-          provision: 'false'
-          cmd: |
-            set -ex
-            uname -a
-            cat /etc/issue
-            if [ -f "/var/lib/kyanos/btf/current.btf" ]; then  
-                bash /host/testdata/test_docker_filter_by_pid.sh 'sudo /host/kyanos/kyanos $kyanos_log_option --btf /var/lib/kyanos/btf/current.btf'
-            else  
-                bash /host/testdata/test_docker_filter_by_pid.sh 'sudo /host/kyanos/kyanos $kyanos_log_option'
-            fi
-
-      - name: Test test containerd filter by container name
-        uses: cilium/little-vm-helper@c44c1221b104ee02ec0235211f7ace3c88eb11a2 # v0.0.19
-        with:
-          provision: 'false'
-          cmd: |
-            set -ex
-            uname -a
-            cat /etc/issue
-            if [ -f "/var/lib/kyanos/btf/current.btf" ]; then  
-                bash /host/testdata/test_containerd_filter_by_container_name.sh 'sudo /host/kyanos/kyanos $kyanos_log_option --btf /var/lib/kyanos/btf/current.btf'
-            else  
-                bash /host/testdata/test_containerd_filter_by_container_name.sh 'sudo /host/kyanos/kyanos $kyanos_log_option'
-            fi
-
-      - name: Test test containerd filter by container id
-        uses: cilium/little-vm-helper@c44c1221b104ee02ec0235211f7ace3c88eb11a2 # v0.0.19
-        with:
-          provision: 'false'
-          cmd: |
-            set -ex
-            uname -a
-            cat /etc/issue
-            if [ -f "/var/lib/kyanos/btf/current.btf" ]; then  
-                bash /host/testdata/test_containerd_filter_by_container_id.sh 'sudo /host/kyanos/kyanos $kyanos_log_option --btf /var/lib/kyanos/btf/current.btf'
-            else  
-                bash /host/testdata/test_containerd_filter_by_container_id.sh 'sudo /host/kyanos/kyanos $kyanos_log_option'
-            fi
-
-      - name: Test redis
-        uses: cilium/little-vm-helper@c44c1221b104ee02ec0235211f7ace3c88eb11a2 # v0.0.19
-        with:
-          provision: 'false'
-          cmd: |
-            set -ex
-            uname -a
-            cat /etc/issue
-            if [ -f "/var/lib/kyanos/btf/current.btf" ]; then  
-                bash /host/testdata/test_redis.sh 'sudo /host/kyanos/kyanos $kyanos_log_option --btf /var/lib/kyanos/btf/current.btf'
-            else  
-                bash /host/testdata/test_redis.sh 'sudo /host/kyanos/kyanos $kyanos_log_option'
-            fi
-
-      - name: Test k8s
-        if: ${{ startsWith(matrix.kernel, '6.') }}
-        uses: cilium/little-vm-helper@c44c1221b104ee02ec0235211f7ace3c88eb11a2 # v0.0.19
-        with:
-          provision: 'false'
-          cmd: |
-            set -ex
-            uname -a
-            cat /etc/issue
-            pushd /host
-            bash /host/testdata/run_k8s_test.sh "" 1
-            popd

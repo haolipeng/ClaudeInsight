@@ -2,9 +2,9 @@ package protocol
 
 import (
 	"fmt"
-	"kyanos/agent/buffer"
-	"kyanos/bpf"
-	"kyanos/common"
+	"claudeinsight/agent/buffer"
+	"claudeinsight/bpf"
+	"claudeinsight/common"
 )
 
 type ProtocolCreator func() ProtocolStreamParser

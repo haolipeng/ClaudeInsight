@@ -3,7 +3,7 @@
 set -ex
 
 CMD="$1"
-FILE_PREFIX="/tmp/kyanos"
+FILE_PREFIX="/tmp/claudeinsight"
 LNAME_IP="${FILE_PREFIX}_filter_by_remote_ip.log"
 LNAME_REMOTE_PORT="${FILE_PREFIX}_filter_by_remote_port.log"
 LNAME_LOCAL_PORT="${FILE_PREFIX}_filter_by_local_port.log"

@@ -2,8 +2,8 @@ package conn
 
 import (
 	"cmp"
-	"kyanos/agent/protocol"
-	"kyanos/common"
+	"claudeinsight/agent/protocol"
+	"claudeinsight/common"
 	"slices"
 	"time"
 )

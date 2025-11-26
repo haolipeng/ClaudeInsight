@@ -1,8 +1,8 @@
 package monitor
 
 import (
-	"kyanos/bpf"
-	"kyanos/common"
+	"claudeinsight/bpf"
+	"claudeinsight/common"
 	"sync"
 	"time"
 )

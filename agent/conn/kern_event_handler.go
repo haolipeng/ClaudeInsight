@@ -3,9 +3,9 @@ package conn
 import (
 	"cmp"
 	"fmt"
-	"kyanos/bpf"
-	"kyanos/common"
-	"kyanos/monitor"
+	"claudeinsight/bpf"
+	"claudeinsight/common"
+	"claudeinsight/monitor"
 	"slices"
 	"strings"
 	"sync"

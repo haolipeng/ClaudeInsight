@@ -3,7 +3,7 @@
 set -ex
 
 CMD="$1"
-FILE_PREFIX="/tmp/kyanos"
+FILE_PREFIX="/tmp/claudeinsight"
 LNAME="${FILE_PREFIX}_dns.log"
 
 function test_dns() {

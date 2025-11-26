@@ -4,19 +4,19 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"kyanos/agent/analysis"
-	anc "kyanos/agent/analysis/common"
-	ac "kyanos/agent/common"
-	"kyanos/agent/compatible"
-	"kyanos/agent/conn"
-	"kyanos/agent/protocol"
-	loader_render "kyanos/agent/render/loader"
-	"kyanos/agent/render/stat"
-	"kyanos/agent/render/watch"
-	"kyanos/bpf"
-	"kyanos/bpf/loader"
-	"kyanos/common"
-	"kyanos/version"
+	"claudeinsight/agent/analysis"
+	anc "claudeinsight/agent/analysis/common"
+	ac "claudeinsight/agent/common"
+	"claudeinsight/agent/compatible"
+	"claudeinsight/agent/conn"
+	"claudeinsight/agent/protocol"
+	loader_render "claudeinsight/agent/render/loader"
+	"claudeinsight/agent/render/stat"
+	"claudeinsight/agent/render/watch"
+	"claudeinsight/bpf"
+	"claudeinsight/bpf/loader"
+	"claudeinsight/common"
+	"claudeinsight/version"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -42,7 +42,7 @@ func SetupAgent(options ac.AgentOptions) {
 	}
 	if enabled, err := common.IsEnableBPF(); err == nil && !enabled {
 		common.AgentLog.Error("BPF is not enabled in your kernel. This might be because your kernel version is too old. " +
-			"Please check the requirements for Kyanos at https://kyanos.io/quickstart.html#installation-requirements.")
+			"Please check the requirements for ClaudeInsight at https://claudeinsight.io/quickstart.html#installation-requirements.")
 		return
 	}
 
@@ -50,7 +50,7 @@ func SetupAgent(options ac.AgentOptions) {
 		common.AgentLog.Error("check capabilities failed: ", err)
 		return
 	} else if !ok {
-		common.AgentLog.Error("Kyanos requires CAP_BPF to run. Please run kyanos with sudo or run container in privilege mode.")
+		common.AgentLog.Error("ClaudeInsight requires CAP_BPF to run. Please run claudeinsight with sudo or run container in privilege mode.")
 		return
 	}
 
@@ -101,7 +101,7 @@ func SetupAgent(options ac.AgentOptions) {
 	var _bf loader.BPF
 	go func(_bf *loader.BPF) {
 		defer wg.Done()
-		options.LoadPorgressChannel <- "🍩 Kyanos starting..."
+		options.LoadPorgressChannel <- "🍩 ClaudeInsight starting..."
 		kernelVersion := compatible.GetCurrentKernelVersion()
 		options.Kv = &kernelVersion
 		var err error
@@ -109,7 +109,7 @@ func SetupAgent(options ac.AgentOptions) {
 			if err != nil {
 				common.AgentLog.Errorf("Failed to load BPF programs: %+v", errors.Unwrap(errors.Unwrap(err)))
 				_bf.Err = err
-				options.LoadPorgressChannel <- "❌ Kyanos start failed"
+				options.LoadPorgressChannel <- "❌ ClaudeInsight start failed"
 				options.LoadPorgressChannel <- "quit"
 			}
 		}()
@@ -192,7 +192,7 @@ func SetupAgent(options ac.AgentOptions) {
 	} else {
 		watch.RunWatchRender(ctx, recordsChannel, options.WatchOptions)
 	}
-	common.AgentLog.Infoln("Kyanos Stopped: ", stop)
+	common.AgentLog.Infoln("ClaudeInsight Stopped: ", stop)
 
 	return
 }
@@ -222,14 +222,14 @@ func logSystemInfo(loadError error) {
 
 	const crashReportFormat = `
 ===================================
-	  Kyanos Crash Report
+	  ClaudeInsight Crash Report
 =========Error Message=============
 %s
 ============OS Info================
 %s
 ===================================
-FAQ         : https://kyanos.io/faq.html
-Submit issue: https://github.com/hengyoush/kyanos/issues
+FAQ         : https://claudeinsight.io/faq.html
+Submit issue: https://github.com/hengyoush/ClaudeInsight/issues
 
 `
 

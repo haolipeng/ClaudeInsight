@@ -1,10 +1,10 @@
 package dns
 
 import (
-	"kyanos/agent/buffer"
-	"kyanos/agent/protocol"
-	"kyanos/bpf"
-	"kyanos/common"
+	"claudeinsight/agent/buffer"
+	"claudeinsight/agent/protocol"
+	"claudeinsight/bpf"
+	"claudeinsight/common"
 	"unsafe"
 
 	"github.com/miekg/dns"

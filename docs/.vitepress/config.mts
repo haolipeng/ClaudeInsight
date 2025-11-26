@@ -2,9 +2,9 @@ import { defineConfig } from "vitepress";
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-  title: "Kyanos",
-  description: "Kyanos official website",
-  head: [["link", { rel: "icon", href: "/kyanos.png" }]], // 浏览器标签页logo
+  title: "ClaudeInsightAsset",
+  description: "ClaudeInsightAsset official website",
+  head: [["link", { rel: "icon", href: "/claudeinsight.png" }]], // 浏览器标签页logo
   locales: {
     cn: { label: "简体中文", lang: "cn" },
     root: { label: "English", lang: "en" }
@@ -12,17 +12,17 @@ export default defineConfig({
   appearance: "dark",
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
-    logo: "/kyanos.png",
+    logo: "/claudeinsight.png",
     nav: [
       { text: "Home", link: "/" },
-      { text: "Guide", link: "./what-is-kyanos" }
+      { text: "Guide", link: "./what-is-claudeinsight" }
     ],
 
     sidebar: [
       {
         text: "Introduction",
         items: [
-          { text: "What is Kyanos?", link: "./what-is-kyanos" },
+          { text: "What is ClaudeInsight?", link: "./what-is-claudeinsight" },
           { text: "Quickstart", link: "./quickstart" },
           { text: "FAQ", link: "./faq" }
         ]
@@ -30,7 +30,7 @@ export default defineConfig({
       {
         text: "Tutorial",
         items: [
-          { text: "Learn kyanos in 5 minutes", link: "./how-to" },
+          { text: "Learn claudeinsight in 5 minutes", link: "./how-to" },
           { text: "How to use watch", link: "./watch" },
           { text: "How to use stat", link: "./stat" }
         ]
@@ -56,12 +56,12 @@ export default defineConfig({
     ],
 
     socialLinks: [
-      { icon: "github", link: "https://github.com/hengyoush/kyanos" }
+      { icon: "github", link: "https://github.com/hengyoush/ClaudeInsight" }
     ],
 
     footer: {
       message:
-        'Released under the <a href="https://github.com/hengyoush/kyanos/blob/main/LICENSE">Apache-2.0 license.',
+        'Released under the <a href="https://github.com/hengyoush/ClaudeInsight/blob/main/LICENSE">Apache-2.0 license.',
       copyright:
         'Copyright © 2024-present <a href="https://github.com/hengyoush">Hengyoush'
     },

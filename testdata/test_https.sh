@@ -3,7 +3,7 @@
 set -ex
 
 CMD="$1"
-FILE_PREFIX="/tmp/kyanos"
+FILE_PREFIX="/tmp/claudeinsight"
 HTTPS_CLIENT_LNAME="${FILE_PREFIX}_https_client.log"
 HTTPS_SERVER_LNAME="${FILE_PREFIX}_https_server.log"
 SENDFILE_TEST_LNAME="${FILE_PREFIX}_sendfile_test.log"

@@ -1,7 +1,7 @@
 package protocol
 
 import (
-	"kyanos/agent/buffer"
+	"claudeinsight/agent/buffer"
 )
 
 func matchByTimestamp(reqStream *ParsedMessageQueue, respStream *ParsedMessageQueue) []Record {

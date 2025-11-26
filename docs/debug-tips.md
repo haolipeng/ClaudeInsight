@@ -6,16 +6,16 @@ Note that every time you modify the eBPF-related code, you need to use
 `make build-bpf` to regenerate some bpf-related code, and then use `make` to
 build or debug in the IDE.
 
-Use `kyanos-debug` to build binary files with debug information for better
+Use `ClaudeInsight-debug` to build binary files with debug information for better
 debugging.
 
 ```sh
-make kyanos-debug
+make ClaudeInsight-debug
 ```
 
 ## Log Related
 
-Start kyanos with logging enabled. Logs are divided into several modules that
+Start claudeinsight with logging enabled. Logs are divided into several modules that
 can be enabled separately. Level 5 is the debug level, and the default is the
 warn level. The following are the log options for each module:
 

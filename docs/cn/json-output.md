@@ -1,6 +1,6 @@
 # JSON 输出格式 <Badge type="tip" text="preview" />
 
-本文档描述了使用 kyanos 的 `--json-output` 参数时的 JSON 输出格式。
+本文档描述了使用 claudeinsight 的 `--json-output` 参数时的 JSON 输出格式。
 
 ## 使用方法
 
@@ -8,10 +8,10 @@
 
 ```bash
 # 输出到终端
-kyanos watch --json-output=stdout
+claudeinsight watch --json-output=stdout
 
 # 输出到文件
-kyanos watch --json-output=/path/to/custom.json
+claudeinsight watch --json-output=/path/to/custom.json
 ```
 
 ## 输出格式
@@ -33,7 +33,7 @@ kyanos watch --json-output=/path/to/custom.json
 
 | 字段          | 类型    | 描述                                    |
 | ------------- | ------- | --------------------------------------- |
-| `protocol`    | string  | 协议名称（如 "HTTP"、"Redis"、"MySQL"） |
+| `protocol`    | string  | 协议名称（如 "HTTP"、"DNS"）       |
 | `side`        | string  | 连接的角色（客户端或服务端）            |
 | `local_addr`  | string  | 本地 IP 地址                            |
 | `local_port`  | number  | 本地端口号                              |

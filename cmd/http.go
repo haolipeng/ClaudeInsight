@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"kyanos/agent/protocol"
+	"claudeinsight/agent/protocol"
 	"regexp"
 
 	"github.com/spf13/cobra"
