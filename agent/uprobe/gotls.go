@@ -19,6 +19,21 @@ import (
 var fileAttachedGoTlsProbeMap = make(map[string]bool)
 var goTlsObjs any
 
+// IsGoProcess checks if a process is a Go program (exported for use in loader)
+func IsGoProcess(pid int) bool {
+	execPath, err := common.GetExecutablePathFromPid(pid)
+	if err != nil {
+		return false
+	}
+
+	isGo, err := common.IsGoExecutable(execPath)
+	if err != nil {
+		return false
+	}
+
+	return isGo
+}
+
 func LoadGoTlsUprobe() error {
 	collectionOptions := &ebpf.CollectionOptions{
 		Programs: ebpf.ProgramOptions{

@@ -79,20 +79,52 @@ func handleSchedExecEvent(filterByPIDEnabled bool, event *bpf.AgentProcessExecEv
 			return
 		}
 	}
-	links, err := AttachSslUprobe(int(event.Pid))
+
 	var procName string
 	if proc, err := process.NewProcess(event.Pid); err == nil {
 		procName, _ = proc.Name()
 	}
+
+	// Check if this is a Node.js process
+	isNodeJs := IsNodeJsProcess(int(event.Pid))
+	var links []link.Link
+	var err error
+
+	if isNodeJs {
+		common.UprobeLog.Infof("Detected Node.js process: pid=%d (%s)", event.Pid, procName)
+		// For Node.js, try to attach directly to the Node.js binary
+		// because Node.js often statically links OpenSSL
+		var nodeLinks []link.Link
+		nodeLinks, err = AttachNodeJsUprobe(int(event.Pid))
+		if err == nil && len(nodeLinks) > 0 {
+			uprobeLinks = append(uprobeLinks, nodeLinks...)
+			common.UprobeLog.Infof("Successfully attached OpenSSL uprobes to Node.js binary: pid=%d (%s)", event.Pid, procName)
+			// Node.js uprobe attached, skip standard SSL uprobe attachment
+			goto skip_standard_ssl
+		} else {
+			common.UprobeLog.Debugf("Failed to attach to Node.js binary, will try standard OpenSSL library: %v", err)
+		}
+	}
+
+	links, err = AttachSslUprobe(int(event.Pid))
+skip_standard_ssl:
 	if err == nil {
 		if len(links) > 0 {
 			uprobeLinks = append(uprobeLinks, links...)
+			if isNodeJs {
+				common.UprobeLog.Infof("Successfully attached OpenSSL uprobes to Node.js process: pid=%d (%s)", event.Pid, procName)
+			}
 		} else {
 			common.UprobeLog.Debugf("Attach OpenSsl uprobes success for pid: %d (%s) use previous libssl path", event.Pid, procName)
 		}
 	} else {
-		common.UprobeLog.Debugf("AttachSslUprobe failed for exec event(pid: %d %s): %v", event.Pid, procName, err)
+		if isNodeJs {
+			common.UprobeLog.Warnf("Failed to attach OpenSSL uprobes to Node.js process: pid=%d (%s), error: %v", event.Pid, procName, err)
+		} else {
+			common.UprobeLog.Debugf("AttachSslUprobe failed for exec event(pid: %d %s): %v", event.Pid, procName, err)
+		}
 	}
+
 	links, err = AttachGoTlsProbes(int(event.Pid))
 	if err == nil {
 		if len(links) > 0 {

@@ -1,15 +1,15 @@
 package loader
 
 import (
-	"container/list"
-	"context"
-	"errors"
-	"fmt"
 	ac "claudeinsight/agent/common"
 	"claudeinsight/agent/compatible"
 	"claudeinsight/agent/uprobe"
 	"claudeinsight/bpf"
 	"claudeinsight/common"
+	"container/list"
+	"context"
+	"errors"
+	"fmt"
 	"net"
 	"os"
 	"path/filepath"
@@ -673,46 +673,101 @@ func attachBpfProgs(ifName string, kernelVersion *compatible.KernelVersion, opti
 }
 
 func attachUprobes(links *list.List, options *ac.AgentOptions, kernelVersion *compatible.KernelVersion, objs any) {
-	pids, err := common.GetAllPids()
+	// 获取要处理的 PIDs
+	var pids []int32
+	var err error
+
+	// 检查用户是否指定了 --pids 参数
+	targetPids := viper.GetStringSlice(common.FilterPidVarName)
+	if len(targetPids) > 0 {
+		// 用户指定了 PIDs，只处理这些 PIDs
+		common.UprobeLog.Infof("Attaching uprobes to specified PIDs: %v", targetPids)
+		for _, pidStr := range targetPids {
+			pidInt, parseErr := strconv.Atoi(pidStr)
+			if parseErr != nil {
+				common.UprobeLog.Errorf("Invalid pid: %s, error: %v", pidStr, parseErr)
+				continue
+			}
+			pids = append(pids, int32(pidInt))
+		}
+	} else {
+		// 没有指定 PIDs，获取所有进程
+		pids, err = common.GetAllPids()
+		if err != nil {
+			common.UprobeLog.Warnf("get all pid failed: %v", err)
+			return
+		}
+		common.UprobeLog.Debugf("Attaching uprobes to all processes, count: %d", len(pids))
+	}
+
 	loadGoTlsErr := uprobe.LoadGoTlsUprobe()
 	if loadGoTlsErr != nil {
 		common.UprobeLog.Debugf("Load GoTls Probe failed: %+v", loadGoTlsErr)
 	}
-	if err == nil {
-		for _, pid := range pids {
-			uprobeLinks, err := uprobe.AttachSslUprobe(int(pid))
-			if err == nil && len(uprobeLinks) > 0 {
-				for _, l := range uprobeLinks {
-					links.PushBack(l)
-				}
-				common.UprobeLog.Infof("Attach OpenSsl uprobes success for pid: %d", pid)
-			} else if err != nil {
-				common.UprobeLog.Infof("Attach OpenSsl uprobes failed: %+v for pid: %d", err, pid)
-			} else if len(uprobeLinks) == 0 {
-				common.UprobeLog.Infof("Attach OpenSsl uprobes success for pid: %d use previous libssl path", pid)
-			}
-			if loadGoTlsErr == nil {
-				gotlsUprobeLinks, err := uprobe.AttachGoTlsProbes(int(pid))
 
-				if err == nil && len(gotlsUprobeLinks) > 0 {
-					for _, l := range gotlsUprobeLinks {
-						links.PushBack(l)
-					}
-					common.UprobeLog.Infof("Attach GoTls uprobes success for pid: %d", pid)
-				} else if err != nil {
-					common.UprobeLog.Infof("Attach GoTls uprobes failed: %+v for pid: %d", err, pid)
-				} else {
-					common.UprobeLog.Infof("Attach GoTls uprobes failed: %+v for pid: %d links is empty %v", err, pid, gotlsUprobeLinks)
-				}
+	for _, pid := range pids {
+		// 1. Try Node.js uprobe (if applicable)
+		if uprobe.IsNodeJsProcess(int(pid)) {
+			common.UprobeLog.Debugf("Detected Node.js process for pid: %d", pid)
+			if attachNodeJsUprobe(pid, links) {
+				// Node.js successfully attached, skip standard OpenSSL
+				continue
 			}
+			// Node.js attach failed, continue with standard OpenSSL
+			common.UprobeLog.Debugf("Attach Node.js OpenSSL uprobes failed for pid: %d, will try standard OpenSSL", pid)
 		}
-	} else {
-		common.UprobeLog.Warnf("get all pid failed: %v", err)
+
+		// 2. Try standard OpenSSL uprobe
+		uprobeLinks, attachErr := uprobe.AttachSslUprobe(int(pid))
+		if attachErr == nil && len(uprobeLinks) > 0 {
+			for _, l := range uprobeLinks {
+				links.PushBack(l)
+			}
+			common.UprobeLog.Infof("Attach OpenSsl uprobes success for pid: %d", pid)
+		} else if attachErr != nil {
+			common.UprobeLog.Infof("Attach OpenSsl uprobes failed: %+v for pid: %d", attachErr, pid)
+		} else if len(uprobeLinks) == 0 {
+			common.UprobeLog.Infof("Attach OpenSsl uprobes success for pid: %d use previous libssl path", pid)
+		}
+
+		// 3. Try Go TLS uprobe (only for Go processes)
+		if loadGoTlsErr == nil && uprobe.IsGoProcess(int(pid)) {
+			common.UprobeLog.Debugf("Detected Go process for pid: %d", pid)
+			attachGoTlsUprobe(pid, links)
+		}
 	}
 }
 
-func attachOpensslToSpecificProcess() bool {
-	return viper.GetInt64(common.FilterPidVarName) > 0
+// attachNodeJsUprobe attempts to attach Node.js uprobes
+// Returns true if Node.js uprobes were successfully attached (should skip standard OpenSSL)
+func attachNodeJsUprobe(pid int32, links *list.List) bool {
+	nodeLinks, err := uprobe.AttachNodeJsUprobe(int(pid))
+	if err != nil || len(nodeLinks) == 0 {
+		return false
+	}
+
+	// Node.js successfully attached
+	for _, l := range nodeLinks {
+		links.PushBack(l)
+	}
+	common.UprobeLog.Infof("Attach Node.js OpenSSL uprobes success for pid: %d", pid)
+
+	return true
+}
+
+// attachGoTlsUprobe attempts to attach Go TLS uprobes
+func attachGoTlsUprobe(pid int32, links *list.List) {
+	gotlsUprobeLinks, err := uprobe.AttachGoTlsProbes(int(pid))
+	if err == nil && len(gotlsUprobeLinks) > 0 {
+		for _, l := range gotlsUprobeLinks {
+			links.PushBack(l)
+		}
+		common.UprobeLog.Infof("Attach GoTls uprobes success for pid: %d", pid)
+	} else if err != nil {
+		common.UprobeLog.Infof("Attach GoTls uprobes failed: %+v for pid: %d", err, pid)
+	} else {
+		common.UprobeLog.Infof("Attach GoTls uprobes failed for pid: %d links is empty", pid)
+	}
 }
 
 func attachSchedProgs(links *list.List) {
