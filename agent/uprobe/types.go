@@ -89,7 +89,7 @@ const (
 	MaxSupportedOpenSSL32Version  = 3 // openssl 3.2.3 ~ newer
 	MaxSupportedOpenSSL33Version  = 2
 	SupportedOpenSSL34Version0    = 1 // openssl 3.4.0
-	SupportedOpenSSL35Version0    = 0 // openssl 3.5.0
+	MaxSupportedOpenSSL35Version  = 2 // openssl 3.5.0 ~ 3.5.2
 )
 const (
 	Linuxdefaulefilename102 = "linux_default_1_0_2"
@@ -325,8 +325,8 @@ func initOpensslOffset() {
 		}
 	}
 
-	// openssl 3.5.0
-	for ch := 0; ch <= SupportedOpenSSL35Version0; ch++ {
+	// openssl 3.5.0 ~ 3.5.2
+	for ch := 0; ch <= MaxSupportedOpenSSL35Version; ch++ {
 		sslVersionBpfMap[fmt.Sprintf("openssl 3.5.%d", ch)] = func() (*ebpf.CollectionSpec, any, error) {
 			r, err := bpf.LoadOpenssl350()
 			if err != nil {
