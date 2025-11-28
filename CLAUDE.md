@@ -2,6 +2,16 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Coding Standards
+
+**IMPORTANT: All code comments MUST be written in English.**
+
+When writing or modifying code in this repository:
+- All comments (function comments, inline comments, TODO comments) must be in English
+- Variable names, function names, and identifiers should use English words
+- Log messages and error messages should be in English
+- Documentation files should be in English
+
 ## Project Overview
 
 claudeinsight is an eBPF-based network issue analysis tool for capturing and analyzing network requests (HTTP, DNS) in real-time. It provides kernel-level latency details and automatic SSL/TLS decryption.
